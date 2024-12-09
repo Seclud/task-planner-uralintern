@@ -11,17 +11,10 @@ from pydantic_models import User, Project, Task
 import database_models
 
 def create_tables():
+    print(database_models.Base_UUID.metadata)
     database_models.Base_UUID.metadata.create_all(bind=engine)
 app = FastAPI()
 
-def get_db():
-    db = Session(engine)
-    try:
-        yield db
-    finally:
-        db.close()
-
-# Dependency to get the database session
 def get_db():
     db = Session(engine)
     try:
@@ -194,7 +187,7 @@ def create_tables_command():
     confirmation_prompt=True,
 )
 def create_user(username: str, password: str):
-    print('aboba')
+    print(database_models.Base_decl.metadata)
     with Session(engine) as session:
         domain_user = database_models.User(
             username=username,
