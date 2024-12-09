@@ -1,17 +1,20 @@
 import uuid
+from typing import Annotated
 
 from fastapi import FastAPI, HTTPException, Depends
 
 import click
+from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy import select
 from sqlmodel import Session
 
+import dependencies
 from config import Settings
-from dependencies import engine, get_password_hash
+from dependencies import engine, get_password_hash, verify_password, get_current_user
 from pydantic_models import User, Project, Task
 import database_models
 
 def create_tables():
-    print(database_models.Base_UUID.metadata)
     database_models.Base_UUID.metadata.create_all(bind=engine)
 app = FastAPI()
 
@@ -198,6 +201,24 @@ def create_user(username: str, password: str):
         session.add(domain_user)
         session.commit()
         session.refresh(domain_user)
+
+@app.post('/login/access-token')
+def login_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], session: Session = Depends(get_db)):
+    user = session.query(database_models.User).filter(database_models.User.username == form_data.username).first()
+    if not user:
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
+    if not verify_password(form_data.password, user.password_hash):
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
+
+    access_token = dependencies.create_access_token(user.id)
+    #response.set_cookie(key='access_token', value=f"Bearer {access_token}", httponly=True)
+
+    return {"access_token": access_token,
+            "token_type": "bearer"}
+
+@app.get("/users_login/me", response_model=User)
+def read_users_me(current_user: User=Depends(get_current_user)):
+    return current_user
 
 if __name__ == "__main__":
     root()
