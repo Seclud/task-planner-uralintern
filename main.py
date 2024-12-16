@@ -2,21 +2,32 @@ import uuid
 from typing import Annotated
 
 from fastapi import FastAPI, HTTPException, Depends
+from datetime import timedelta
+from typing import List, Annotated
+from fastapi.security import OAuth2PasswordRequestForm
 
 import click
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
 from sqlmodel import Session
-
+from fastapi.middleware.cors import CORSMiddleware
 import dependencies
 from config import Settings
 from dependencies import engine, get_password_hash, verify_password, get_current_user
-from pydantic_models import User, Project, Task
+from pydantic_models import User, Project, Task, Token, LoginData
 import database_models
 
 def create_tables():
-    database_models.Base_UUID.metadata.create_all(bind=engine)
+    database_models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def get_db():
     db = Session(engine)
@@ -168,6 +179,43 @@ def delete_task(task_id: uuid.UUID, db: Session = Depends(get_db)):
     db.commit()
     return {"message": "Task deleted"}
 
+@app.get("/projects/", response_model=List[Project])
+def read_projects(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    projects = db.query(ProjectModel).all()
+    result = []
+    for project in projects:
+        efficiency = calculate_efficiency(project)
+        user_role = get_user_role_in_project(current_user.id, project.id, db)
+        participants = get_project_participants(project.id, db)
+        result.append(Project(
+            id=project.id,
+            name=project.name,
+            efficiency=efficiency,
+            user_role=user_role,
+            participants=participants
+        ))
+    return result
+
+@app.post("/login/access-token", response_model=Token)
+def login_access_token(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    db: Session = Depends(get_db)
+):
+    user = db.query(database_models.User).filter(database_models.User.username == form_data.username).first()
+    if not user or not verify_password(form_data.password, user.password_hash):
+        raise HTTPException(
+            status_code=400,
+            detail="Incorrect username or password"
+        )
+    
+    access_token_expires = timedelta(minutes=Settings().ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data=str(user.id), expires_delta=access_token_expires
+    )
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
+    }
 
 @click.group()
 @click.pass_context
