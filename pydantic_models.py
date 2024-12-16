@@ -63,3 +63,11 @@ class Comment(BaseModel):
     user_id: Optional[UserId] = Field(title='User Identifier')
     content: str = Field(title='Content')
     created_at: Optional[datetime] = Field(title='Created At')
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class LoginData(BaseModel):
+    username: str
+    password: str
