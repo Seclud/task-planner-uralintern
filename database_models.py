@@ -1,7 +1,7 @@
 import uuid
-from datetime import datetime, UTC
+from datetime import datetime, UTC, date
 import sqlalchemy as sa
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects import postgresql as sa_psql
 
@@ -36,6 +36,12 @@ class Role(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True, nullable=False, comment='Название роли')
 
+class UserProjectLink(Base):
+    __tablename__ = 'user_project_link'
+
+    user_id: Mapped[uuid.UUID] = mapped_column(sa_psql.UUID(as_uuid=True), sa.ForeignKey('users.id'), primary_key=True)
+    project_id: Mapped[uuid.UUID] = mapped_column(sa_psql.UUID(as_uuid=True), sa.ForeignKey('projects.id'), primary_key=True)
+
 class User(Base_UUID):
     __tablename__ = 'users'
 
@@ -45,6 +51,7 @@ class User(Base_UUID):
     password_hash: Mapped[str] = mapped_column(comment='Хэш пароля')
     role: Mapped[int] = mapped_column(sa.ForeignKey('roles.id'), comment='Идентификатор роли')
     is_active: Mapped[bool] = mapped_column(sa.Boolean(), default=True, comment='Активен')
+    projects: Mapped[list["Project"]] = relationship(secondary='user_project_link', back_populates='participants')
 
 class Project(Base_UUID):
     __tablename__ = 'projects'
@@ -53,11 +60,9 @@ class Project(Base_UUID):
     description: Mapped[str] = mapped_column(nullable=True, comment='Описание проекта')
     start_date: Mapped[datetime] = mapped_column(sa.Date, nullable=True, comment='Дата начала')
     end_date: Mapped[datetime] = mapped_column(sa.Date, nullable=True, comment='Дата окончания')
-
-class TaskStatus(Base_UUID):
-    __tablename__ = 'taskstatus'
-
-    name: Mapped[str] = mapped_column(unique=True, nullable=False, comment='Название статуса задачи')
+    created_by: Mapped[uuid.UUID] = mapped_column(nullable=False, comment="Создатель проекта")
+    participants: Mapped[list["User"]] = relationship(secondary='user_project_link', back_populates='projects')
+    statuses: Mapped[list[str]] = mapped_column(sa.ARRAY(sa.String), default=["Новые задачи", "В процессе", "Ревью", "Завершенные", "Просроченные"], comment='Статусы задач')
 
 class Task(Base_UUID):
     __tablename__ = 'tasks'
@@ -65,8 +70,8 @@ class Task(Base_UUID):
     project_id: Mapped[uuid.UUID] = mapped_column(sa_psql.UUID(as_uuid=True), sa.ForeignKey('projects.id'), comment='Идентификатор проекта')
     title: Mapped[str] = mapped_column(nullable=False, comment='Название задачи')
     description: Mapped[str] = mapped_column(nullable=True, comment='Описание задачи')
-    status: Mapped[uuid.UUID] = mapped_column(sa_psql.UUID(as_uuid=True), sa.ForeignKey('taskstatus.id'), comment='Идентификатор статуса задачи')
-    due_date: Mapped[datetime] = mapped_column(sa.Date, nullable=True, comment='Срок выполнения')
+    status: Mapped[str] = mapped_column(comment='Статус задачи')
+    due_date: Mapped[date] = mapped_column(sa.Date, nullable=True, comment='Срок выполнения')
     created_by: Mapped[uuid.UUID] = mapped_column(sa_psql.UUID(as_uuid=True), sa.ForeignKey('users.id'), comment='Создано пользователем')
     assigned_to: Mapped[uuid.UUID] = mapped_column(sa_psql.UUID(as_uuid=True), sa.ForeignKey('users.id'), comment='Назначено пользователю')
 
@@ -81,7 +86,6 @@ class ActivityLog(Base_UUID):
 
     user_id: Mapped[uuid.UUID] = mapped_column(sa_psql.UUID(as_uuid=True), sa.ForeignKey('users.id'), comment='Идентификатор пользователя')
     action: Mapped[str] = mapped_column(nullable=False, comment='Действие')
-    timestamp: Mapped[datetime] = mapped_column(sa.DateTime(timezone=True), default=utc_now, comment='Временная метка')
 
 class Comment(Base_UUID):
     __tablename__ = 'comments'
