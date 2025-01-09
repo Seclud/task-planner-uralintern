@@ -1,0 +1,151 @@
+import {useParams} from 'react-router-dom';
+import {useEffect, useState} from 'react';
+import {Badge, Button, Card, Container, Group, Text, Textarea} from '@mantine/core';
+import {useAuth} from "../contexts/AuthContext.jsx";
+import TaskChangeModal from "../modals/TaskChangeModal.jsx";
+
+export default function TaskDetailPage() {
+    const {id} = useParams();
+    const [task, setTask] = useState(null);
+    const [assignedTo, setAssignedTo] = useState('');
+    const [createdBy, setCreatedBy] = useState('');
+    const [comments, setComments] = useState([]);
+    const [newComment, setNewComment] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const auth = useAuth();
+
+
+    const statusMap = {
+        'open': 'Новая задача',
+        'inprogress': 'В процессе',
+        'completed': 'Завершена',
+        'review': 'Ревью',
+        'overdue': 'Просрочена'
+    };
+
+    const fetchTask = async () => {
+        const token = localStorage.getItem('authToken');
+        const response = await fetch(`http://127.0.0.1:8000/tasks/${id}/`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const data = await response.json();
+        setTask(data);
+        fetchUser(data.assigned_to, setAssignedTo);
+        fetchUser(data.created_by, setCreatedBy);
+    };
+
+    const fetchUser = async (userId, setUser) => {
+        const token = localStorage.getItem('authToken');
+        const response = await fetch(`http://127.0.0.1:8000/users/${userId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const data = await response.json();
+        setUser(data.username);
+    };
+
+    const fetchComments = async () => {
+        const response = await fetch(`http://127.0.0.1:8000/comments/tasks/${id}`);
+        const data = await response.json();
+        const commentsWithUsernames = await Promise.all(data.map(async (comment) => {
+            const userResponse = await fetch(`http://127.0.0.1:8000/users/${comment.user_id}`);
+            const userData = await userResponse.json();
+            return {...comment, username: userData.username};
+        }));
+        setComments(commentsWithUsernames);
+    };
+
+    const handleAddComment = async () => {
+        const token = localStorage.getItem('authToken');
+        const response = await fetch(`http://127.0.0.1:8000/comments/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({content: newComment, task_id: id, user_id: auth.user.id})
+        });
+        if (response.ok) {
+            setNewComment('');
+            fetchComments();
+        }
+    };
+
+    const deleteTask = async () => {
+        await fetch(`http://127.0.0.1:8000/tasks/${id}/`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+            }
+        });
+        // Redirect to another page after deletion
+        window.location.href = `/projects/${task.project_id}`;
+    };
+
+    useEffect(() => {
+        fetchTask();
+        fetchComments();
+    }, [id]);
+
+    if (!task) {
+        return <div>Loading...</div>;
+    }
+
+    return (
+        <Container>
+            <Card shadow="sm" padding="lg" radius="md" withBorder>
+                <Group position="apart" justify="space-between">
+                    <div>
+                        <Text weight={500} size="xl">Название: {task.title}</Text>
+                        <Text size="sm" color="dimmed">Описание : {task.description} </Text>
+                        <Badge color="green" variant="light">
+                            До: {task.due_date}
+                        </Badge>
+                        <Badge color="blue" variant="light">
+                            Статус: {statusMap[task.status] || task.status}
+                        </Badge>
+                        <Badge color="pink" variant="light">
+                            Исполнитель: {assignedTo}
+                        </Badge>
+                        <Badge color="yellow" variant="light">
+                            Автор: {createdBy}
+                        </Badge>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                        <Button color="yellow" onClick={() => setIsModalOpen(true)} style={{ marginBottom: 10 }}>Изменить</Button>
+                        <Button color="red" onClick={deleteTask}>Удалить</Button>
+                    </div>
+                </Group>
+            </Card>
+            <Card shadow="sm" padding="lg" radius="md" withBorder>
+                <Text weight={500} size="xl">Комментарии</Text>
+                {comments.map(comment => (
+                    <Text key={comment.id} size="sm" color="dimmed">
+                        {comment.username}: {comment.content}
+                    </Text>
+                ))}
+            </Card>
+            <Card>
+                <Textarea
+                    placeholder="Добавить комментарий"
+                    value={newComment}
+                    onChange={(event) => setNewComment(event.currentTarget.value)}
+                />
+                <Button onClick={handleAddComment} disabled={!newComment}>Добавить комментарий</Button>
+            </Card>
+            <TaskChangeModal
+                isOpen={isModalOpen}
+                setIsOpen={setIsModalOpen}
+                taskId={id}
+                title={task.title}
+                description={task.description}
+                dueDate={task.due_date}
+                status={task.status}
+                assignedTo={task.assigned_to}
+            />
+        </Container>
+    );
+}
