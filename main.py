@@ -1,7 +1,7 @@
 import uuid
 from typing import Annotated
 
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Response
 from datetime import timedelta
 from typing import List, Annotated
 from fastapi.security import OAuth2PasswordRequestForm
@@ -14,208 +14,36 @@ from fastapi.middleware.cors import CORSMiddleware
 import dependencies
 from config import Settings
 from dependencies import engine, get_password_hash, verify_password, get_current_user
-from pydantic_models import User, Project, Task, Token, LoginData
+from pydantic_models import User, Project, Task, Token, LoginData, UserReg, ProjectCreate, TaskCreate
 import database_models
+from routes import users, projects, tasks, auth, roles, comments
+
 
 def create_tables():
     database_models.Base.metadata.create_all(bind=engine)
+
 app = FastAPI()
+
+origins = [
+    "http://localhost:5173",
+    "http://localhost:8000",
+    "http://localhost",
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
     allow_headers=["*"],
 )
 
-def get_db():
-    db = Session(engine)
-    try:
-        yield db
-    finally:
-        db.close()
-
-# Маршруты
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-# CRUD для пользователей
-@app.post("/users/", response_model=User)
-def create_user(user: User, db: Session = Depends(get_db)):
-    db_user = database_models.User(
-        username=user.username,
-        email=user.email,
-        phone=user.phone,
-        password_hash=get_password_hash(user.password_hash),
-        role=user.role,
-        is_active=True
-    )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
-
-@app.get("/users/{user_id}", response_model=User)
-def read_user(user_id: uuid.UUID, db: Session = Depends(get_db)):
-    db_user = db.query(database_models.User).filter(database_models.User.id == user_id).first()
-    if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return db_user
-
-@app.put("/users/{user_id}", response_model=User)
-def update_user(user_id: uuid.UUID, updated_user: User, db: Session = Depends(get_db)):
-    db_user = db.query(database_models.User).filter(database_models.User.id == user_id).first()
-    if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    db_user.username = updated_user.username
-    db_user.email = updated_user.email
-    db_user.phone = updated_user.phone
-    db_user.password_hash = get_password_hash(updated_user.password_hash)
-    db_user.role = updated_user.role
-    db.commit()
-    db.refresh(db_user)
-    return db_user
-
-@app.delete("/users/{user_id}")
-def delete_user(user_id: uuid.UUID, db: Session = Depends(get_db)):
-    db_user = db.query(database_models.User).filter(database_models.User.id == user_id).first()
-    if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    db.delete(db_user)
-    db.commit()
-    return {"message": "User deleted"}
-
-# CRUD для проектов
-@app.post("/projects/", response_model=Project)
-def create_project(project: Project, db: Session = Depends(get_db)):
-    db_project = database_models.Project(
-        name=project.name,
-        description=project.description,
-        start_date=project.start_date,
-        end_date=project.end_date
-    )
-    db.add(db_project)
-    db.commit()
-    db.refresh(db_project)
-    return db_project
-
-@app.get("/projects/{project_id}", response_model=Project)
-def read_project(project_id: uuid.UUID, db: Session = Depends(get_db)):
-    db_project = db.query(database_models.Project).filter(database_models.Project.id == project_id).first()
-    if db_project is None:
-        raise HTTPException(status_code=404, detail="Project not found")
-    return db_project
-
-@app.put("/projects/{project_id}", response_model=Project)
-def update_project(project_id: uuid.UUID, updated_project: Project, db: Session = Depends(get_db)):
-    db_project = db.query(database_models.Project).filter(database_models.Project.id == project_id).first()
-    if db_project is None:
-        raise HTTPException(status_code=404, detail="Project not found")
-    db_project.name = updated_project.name
-    db_project.description = updated_project.description
-    db_project.start_date = updated_project.start_date
-    db_project.end_date = updated_project.end_date
-    db.commit()
-    db.refresh(db_project)
-    return db_project
-
-@app.delete("/projects/{project_id}")
-def delete_project(project_id: uuid.UUID, db: Session = Depends(get_db)):
-    db_project = db.query(database_models.Project).filter(database_models.Project.id == project_id).first()
-    if db_project is None:
-        raise HTTPException(status_code=404, detail="Project not found")
-    db.delete(db_project)
-    db.commit()
-    return {"message": "Project deleted"}
-
-# CRUD для задач
-@app.post("/tasks/", response_model=Task)
-def create_task(task: Task, db: Session = Depends(get_db)):
-    db_task = database_models.Task(
-        project_id=task.project_id,
-        title=task.title,
-        description=task.description,
-        status=task.status,
-        due_date=task.due_date,
-        created_by=task.created_by,
-        assigned_to=task.assigned_to
-    )
-    db.add(db_task)
-    db.commit()
-    db.refresh(db_task)
-    return db_task
-
-@app.get("/tasks/{task_id}", response_model=Task)
-def read_task(task_id: uuid.UUID, db: Session = Depends(get_db)):
-    db_task = db.query(database_models.Task).filter(database_models.Task.id == task_id).first()
-    if db_task is None:
-        raise HTTPException(status_code=404, detail="Task not found")
-    return db_task
-
-@app.put("/tasks/{task_id}", response_model=Task)
-def update_task(task_id: uuid.UUID, updated_task: Task, db: Session = Depends(get_db)):
-    db_task = db.query(database_models.Task).filter(database_models.Task.id == task_id).first()
-    if db_task is None:
-        raise HTTPException(status_code=404, detail="Task not found")
-    db_task.title = updated_task.title
-    db_task.description = updated_task.description
-    db_task.status = updated_task.status
-    db_task.due_date = updated_task.due_date
-    db_task.project_id = updated_task.project_id
-    db_task.created_by = updated_task.created_by
-    db_task.assigned_to = updated_task.assigned_to
-    db.commit()
-    db.refresh(db_task)
-    return db_task
-
-@app.delete("/tasks/{task_id}")
-def delete_task(task_id: uuid.UUID, db: Session = Depends(get_db)):
-    db_task = db.query(database_models.Task).filter(database_models.Task.id == task_id).first()
-    if db_task is None:
-        raise HTTPException(status_code=404, detail="Task not found")
-    db.delete(db_task)
-    db.commit()
-    return {"message": "Task deleted"}
-
-@app.get("/projects/", response_model=List[Project])
-def read_projects(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    projects = db.query(ProjectModel).all()
-    result = []
-    for project in projects:
-        efficiency = calculate_efficiency(project)
-        user_role = get_user_role_in_project(current_user.id, project.id, db)
-        participants = get_project_participants(project.id, db)
-        result.append(Project(
-            id=project.id,
-            name=project.name,
-            efficiency=efficiency,
-            user_role=user_role,
-            participants=participants
-        ))
-    return result
-
-@app.post("/login/access-token", response_model=Token)
-def login_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-    db: Session = Depends(get_db)
-):
-    user = db.query(database_models.User).filter(database_models.User.username == form_data.username).first()
-    if not user or not verify_password(form_data.password, user.password_hash):
-        raise HTTPException(
-            status_code=400,
-            detail="Incorrect username or password"
-        )
-    
-    access_token_expires = timedelta(minutes=Settings().ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data=str(user.id), expires_delta=access_token_expires
-    )
-    return {
-        "access_token": access_token,
-        "token_type": "bearer"
-    }
+app.include_router(users.router)
+app.include_router(projects.router)
+app.include_router(tasks.router)
+app.include_router(auth.router)
+app.include_router(roles.router)
+app.include_router(comments.router)
 
 @click.group()
 @click.pass_context
@@ -229,6 +57,7 @@ def manage_group():
 @manage_group.command(name="create_tables")
 def create_tables_command():
     create_tables()
+
 @manage_group.command(name="create_user")
 @click.option('--username', prompt='Your name please')
 @click.option(
@@ -237,7 +66,7 @@ def create_tables_command():
     hide_input=True,
     confirmation_prompt=True,
 )
-def create_user(username: str, password: str):
+def create_user_manual(username: str, password: str):
     print(database_models.Base_decl.metadata)
     with Session(engine) as session:
         domain_user = database_models.User(
@@ -249,24 +78,6 @@ def create_user(username: str, password: str):
         session.add(domain_user)
         session.commit()
         session.refresh(domain_user)
-
-@app.post('/login/access-token')
-def login_user(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], session: Session = Depends(get_db)):
-    user = session.query(database_models.User).filter(database_models.User.username == form_data.username).first()
-    if not user:
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
-    if not verify_password(form_data.password, user.password_hash):
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
-
-    access_token = dependencies.create_access_token(user.id)
-    #response.set_cookie(key='access_token', value=f"Bearer {access_token}", httponly=True)
-
-    return {"access_token": access_token,
-            "token_type": "bearer"}
-
-@app.get("/users_login/me", response_model=User)
-def read_users_me(current_user: User=Depends(get_current_user)):
-    return current_user
 
 if __name__ == "__main__":
     root()
