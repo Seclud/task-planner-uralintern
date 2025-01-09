@@ -1,26 +1,45 @@
-// import { Routes, Route } from 'react-router-dom';
-// import HomePage from './pages/HomePage';
-// import LoginPage from './pages/LoginPage';
-// import RegisterPage from './pages/RegisterPage';
-// import ProjectsPage from './pages/ProjectsPage';
-// import ProfilePage from './pages/ProfilePage';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { MantineProvider } from '@mantine/core';
+import Layout from './components/Layout';
+import ProjectDetailsPage from './pages/ProjectDetailsPage';
+import ProjectsPage from './pages/ProjectsPage';
+import HomePage from './pages/HomePage.jsx';
+import LoginPage from "./pages/LoginPage.jsx";
+import AllTasksPage from "./pages/AllTasksPage.jsx";
+import TaskDetailPage from "./pages/TaskDetailPage.jsx";
+import RegistrationPage from "./pages/RegistrationPage.jsx";
+import TestPage from './pages/TestPage.jsx';
+import ProfilePage from './pages/ProfilePage.jsx';
+import AdminUsersPage from './pages/AdminUsersPage';
+import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
+import { Notifications } from "@mantine/notifications";
+import AdminRoute from './components/AdminRoute';
 
-import '@mantine/core/styles.css';
+const PrivateRoute = ({ children }) => {
+    const auth = useAuth();
+    return auth.isAuthenticated ? children : <Navigate to="/login" />;
+};
 
-import {MantineProvider} from '@mantine/core';
-import { Card, Image, Text, Badge, Button, Group } from '@mantine/core';
-
-function App() {
+export default function App() {
     return (
-        <MantineProvider>
-            <div>
-                <Card shadow="sm" padding="lg" radius="md" withBorder>
-                    Hello
-                </Card>
-
-            </div>
-        </MantineProvider>
+        <AuthProvider>
+            <MantineProvider>
+                <Notifications />
+                <Routes>
+                    <Route element={<Layout />}>
+                        <Route path="/projects" element={<PrivateRoute><ProjectsPage /></PrivateRoute>} />
+                        <Route path="/projects/:id" element={<PrivateRoute><ProjectDetailsPage /></PrivateRoute>} />
+                        <Route path="/tasks" element={<PrivateRoute><AllTasksPage /></PrivateRoute>} />
+                        <Route path="/tasks/:id" element={<PrivateRoute><TaskDetailPage /></PrivateRoute>} />
+                        <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/login" element={<LoginPage />} />
+                        <Route path="/registration" element={<RegistrationPage />} />
+                        <Route path="/test" element={<TestPage />} />
+                        <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
+                    </Route>
+                </Routes>
+            </MantineProvider>
+        </AuthProvider>
     );
 }
-
-export default App;
