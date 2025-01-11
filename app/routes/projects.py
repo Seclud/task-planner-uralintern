@@ -82,6 +82,10 @@ def delete_project(project_id: uuid.UUID, db: Session = Depends(get_db)):
     db_project = db.query(database_models.Project).filter(database_models.Project.id == project_id).first()
     if db_project is None:
         raise HTTPException(status_code=404, detail="Project not found")
+
+    db.query(database_models.Task).filter(database_models.Task.project_id == project_id).delete()
+    db.commit()
+    
     db.delete(db_project)
     db.commit()
     return {"message": "Project deleted"}

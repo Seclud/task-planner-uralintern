@@ -67,7 +67,11 @@ class Project(Base_UUID):
 class Task(Base_UUID):
     __tablename__ = 'tasks'
 
-    project_id: Mapped[uuid.UUID] = mapped_column(sa_psql.UUID(as_uuid=True), sa.ForeignKey('projects.id'), comment='Идентификатор проекта')
+    project_id: Mapped[uuid.UUID] = mapped_column(
+        sa_psql.UUID(as_uuid=True), 
+        sa.ForeignKey('projects.id', ondelete='CASCADE'), 
+        comment='Идентификатор проекта'
+    )
     title: Mapped[str] = mapped_column(nullable=False, comment='Название задачи')
     description: Mapped[str] = mapped_column(nullable=True, comment='Описание задачи')
     status: Mapped[str] = mapped_column(comment='Статус задачи')
