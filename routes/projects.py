@@ -39,6 +39,11 @@ def create_project(project: ProjectCreate, db: Session = Depends(get_db)):
     
     return db_project
 
+@router.get("/projects/all", response_model=list[Project])
+def read_all_projects(db: Session = Depends(get_db)):
+    projects = db.query(database_models.Project).all()
+    return projects
+
 @router.get("/projects/{project_id}")
 def read_project(project_id: uuid.UUID, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     db_project = db.query(database_models.Project).filter(
@@ -88,7 +93,6 @@ def read_projects(current_user: User = Depends(get_current_user), db: Session = 
         (database_models.Project.participants.any(database_models.User.id == current_user.id))
     ).all()
     return projects
-
 
 @router.get("/projects/{project_id}/participants", response_model=list[User])
 def get_project_participants(project_id: uuid.UUID, db: Session = Depends(get_db)):
