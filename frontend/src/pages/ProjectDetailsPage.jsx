@@ -1,10 +1,12 @@
 import { Link, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Badge, Button, Card, Group, SimpleGrid, Space, Text, Divider, ScrollArea } from '@mantine/core';
+import { Badge, Button, Card, Group, SimpleGrid, Space, Text, Divider, ScrollArea, Paper } from '@mantine/core';
 import PropTypes from 'prop-types';
 import TaskCreateModal from '../modals/TaskCreateModal.jsx';
 import ProjectChangeModal from '../modals/ProjectChangeModal.jsx';
 import AddColumnModal from '../modals/AddColumnModal.jsx';
+import { useAuth } from "../contexts/AuthContext.jsx";
+
 
 function TaskList({ title, tasks, onTaskDragStart, onTaskDragOver, onTaskDrop, removeColumn, isEditMode, moveColumnLeft, moveColumnRight, index, totalColumns, showOldTasks, completedStatus }) {
     const filteredTasks = tasks.filter(task => {
@@ -35,50 +37,28 @@ function TaskList({ title, tasks, onTaskDragStart, onTaskDragOver, onTaskDrop, r
                 </Group>
             )}
             {filteredTasks.map((task, index) => (
-                <Card
-                    key={index}
-                    draggable
-                    onDragStart={(e) => onTaskDragStart(e, task)}
-                    shadow="sm"
-                    padding="lg"
-                    radius="md"
-                    withBorder
-                >
-                    <Link to={`/tasks/${task.id}`}>
-                        <Text weight={500}>{task.title}</Text>
-                    </Link>
-                    <Text size="sm" color="dimmed">{task.description}</Text>
-                    <Badge color="green" variant="light">
-                        До: {task.due_date}
-                    </Badge>
-                    <Text size="sm" color="blue">Автор: {task.created_by.username}</Text>
-                    <Text size="sm" color="blue">Назначен: {task.assigned_to.username}</Text>
-                </Card>
+                <Link to={`/tasks/${task.id}`} key={index} style={{ textDecoration: 'none' }}>
+                    <Paper
+                        draggable
+                        onDragStart={(e) => onTaskDragStart(e, task)}
+                        shadow="sm"
+                        padding="lg"
+                        radius="md"
+                        withBorder
+                        style={{ wordWrap: 'break-word', maxWidth: 300, cursor: 'pointer' }}
+                    >
+                        <Text weight={500} style={{ wordWrap: 'break-word', padding: '5px' }}>{task.title}</Text>
+                        <Badge color={new Date(task.due_date) < new Date() ? "red" : "green"} variant="light" style={{ padding: '5px' }}>
+                            До: {task.due_date}
+                        </Badge>
+                        <Text size="sm" color="blue" style={{ wordWrap: 'break-word', padding: '5px' }}>Автор: {task.created_by.username}</Text>
+                        <Text size="sm" color="blue" style={{ wordWrap: 'break-word', padding: '5px' }}>Назначен: {task.assigned_to.username}</Text>
+                    </Paper>
+                </Link>
             ))}
         </div>
     );
 }
-
-TaskList.propTypes = {
-    title: PropTypes.string.isRequired,
-    tasks: PropTypes.arrayOf(PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        title: PropTypes.string.isRequired,
-        description: PropTypes.string.isRequired,
-        due_date: PropTypes.string.isRequired,
-        status: PropTypes.string.isRequired,
-    })).isRequired,
-    onTaskDragStart: PropTypes.func.isRequired,
-    onTaskDragOver: PropTypes.func.isRequired,
-    onTaskDrop: PropTypes.func.isRequired,
-    removeColumn: PropTypes.func.isRequired,
-    isEditMode: PropTypes.bool.isRequired,
-    moveColumnLeft: PropTypes.func.isRequired,
-    moveColumnRight: PropTypes.func.isRequired,
-    index: PropTypes.number.isRequired,
-    totalColumns: PropTypes.number.isRequired,
-    completedStatus: PropTypes.string.isRequired,
-};
 
 function ProjectDetailsPage() {
     const { id } = useParams();
@@ -92,6 +72,10 @@ function ProjectDetailsPage() {
     const [participants, setParticipants] = useState([]);
     const [statuses, setStatuses] = useState([]);
     const [showOldTasks, setShowOldTasks] = useState(false);
+    const [hiddenOldTasksCount, setHiddenOldTasksCount] = useState(0);
+    const auth = useAuth();
+
+    const completedStatus = statuses[statuses.length - 1];
 
     const fetchUser = async (userId) => {
         const token = localStorage.getItem('authToken');
@@ -162,6 +146,17 @@ function ProjectDetailsPage() {
 
         return () => clearInterval(interval);
     }, [tasks]);
+
+    useEffect(() => {
+        const countHiddenOldTasks = () => {
+            const threeDaysAgo = new Date();
+            threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+            const count = tasks.filter(task => new Date(task.updated_at) < threeDaysAgo && task.status === completedStatus).length;
+            setHiddenOldTasksCount(count);
+        };
+
+        countHiddenOldTasks();
+    }, [tasks, completedStatus]);
 
     if (!project) {
         return <div>Loading...</div>;
@@ -286,8 +281,6 @@ function ProjectDetailsPage() {
         setIsEditMode(false);
     };
 
-    const completedStatus = statuses[statuses.length - 1];
-
     return (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
             <Group position="apart" justify="space-between">
@@ -305,29 +298,39 @@ function ProjectDetailsPage() {
                     </Group>
                     <Text size="sm" color="dimmed">Участники: {participants.map(p => p.username).join(', ')}</Text>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                    <Button color="green" onClick={() => setIsTaskCreateModalOpen(true)} style={{ marginBottom: 10 }}>Создать задачу</Button>
-                    <Button color="yellow" onClick={() => setIsProjectChangeModalOpen(true)} style={{ marginBottom: 10 }}>Изменить</Button>
-                    <Button color="red" onClick={deleteProject}>Удалить проект</Button>
-                    <Button onClick={() => setIsAddColumnModalOpen(true)} style={{ marginBottom: 10 }}>
-                        Добавить статус
-                    </Button>
-                    <Button
-                        onClick={() => {
-                            if (isEditMode) {
-                                saveColumnOrder();
-                            } else {
-                                setIsEditMode(true);
-                            }
-                        }}
-                        style={{ marginBottom: 10 }}
-                    >
-                        {isEditMode ? 'Сохранить' : 'Изменить статусы'}
-                    </Button>
-                    <Button onClick={() => setShowOldTasks(!showOldTasks)} style={{ marginBottom: 10 }}>
-                        {showOldTasks ? 'Скрыть старые завершенные задачи' : 'Показать старые завершенные задачи'}
-                    </Button>
-                </div>
+                {auth.user.role !== 3 && (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                        <Group spacing="xs">
+                            <Button color="green" onClick={() => setIsTaskCreateModalOpen(true)}>Добавить задачу</Button>
+                            <Button color="yellow" onClick={() => setIsProjectChangeModalOpen(true)}>Изменить проект</Button>
+                            <Button color="red" onClick={deleteProject}>Удалить проект</Button>
+                        </Group>
+                        <Space h="md" />
+                        <Group spacing="xs">
+                            <Button onClick={() => setIsAddColumnModalOpen(true)}>Добавить статус задач</Button>
+                            <Button
+                                onClick={() => {
+                                    if (isEditMode) {
+                                        saveColumnOrder();
+                                    } else {
+                                        setIsEditMode(true);
+                                    }
+                                }}
+                            >
+                                {isEditMode ? 'Сохранить' : 'Изменить статусы задач'}
+                            </Button>
+                            {!showOldTasks && (
+                                <Badge color="gray" variant="light">
+                                    Скрытых задач{hiddenOldTasksCount}
+                                </Badge>
+                            )}
+                            <Button onClick={() => setShowOldTasks(!showOldTasks)}>
+                                {showOldTasks ? 'Скрыть старые завершенные задачи' : 'Показать старые завершенные задачи'}
+                            </Button>
+                            
+                        </Group>
+                    </div>
+                )}
             </Group>
             <Space h="md" />
             <Divider my="md" color="black" />
