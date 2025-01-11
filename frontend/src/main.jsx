@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import './index.css';
 import App from './App.jsx';
 
-export const BACKEND_URL = import.meta.env.REACT_APP_BACKEND_URL;
+export const BACKEND_URL = import.meta.env.VITE_API_URL;
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
