@@ -13,6 +13,9 @@ export default function LoginPage() {
 
     const { login } = useAuth();
 
+    const apiUrl = import.meta.env.VITE_API_URL;
+    console.log("API URL:", apiUrl);
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
