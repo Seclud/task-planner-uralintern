@@ -12,18 +12,9 @@ export default function TaskChangeModal(props) {
     const [assignedTo, setAssignedTo] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [users, setUsers] = useState([]);
-
-    const statusOptions = [
-        { value: 'open', label: 'Новая задача' },
-        { value: 'inprogress', label: 'В процессе' },
-        { value: 'completed', label: 'Завершена' },
-        { value: 'review', label: 'Ревью' },
-        { value: 'overdue', label: 'Просрочена' }
-    ];
-
+    const [statuses, setStatuses] = useState([]);
 
     useEffect(() => {
-
         fetch('http://127.0.0.1:8000/users/', {
             method: 'GET',
             credentials: 'include',
@@ -35,12 +26,23 @@ export default function TaskChangeModal(props) {
             .then(data => setUsers(data))
             .catch(error => console.error('Error fetching users:', error));
 
+        fetch(`http://127.0.0.1:8000/projects/${props.projectId}/`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+            }
+        })
+            .then(response => response.json())
+            .then(data => setStatuses(data.statuses || []))
+            .catch(error => console.error('Error fetching project statuses:', error));
+
         setTitle(props.title || '');
         setDescription(props.description || '');
         setDueDate(props.dueDate ? new Date(props.dueDate) : null);
         setStatus(props.status || '');
         setAssignedTo(props.assignedTo || '');
-    }, [props.title, props.description, props.dueDate, props.status, props.assignedTo]);
+    }, [props.title, props.description, props.dueDate, props.status, props.assignedTo, props.projectId]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -104,7 +106,7 @@ export default function TaskChangeModal(props) {
                 <Select
                     label="Статус"
                     placeholder="Выберите новый статус"
-                    data={statusOptions}
+                    data={statuses.map(status => ({ value: status, label: status }))}
                     onChange={setStatus}
                     value={status}
                 />
