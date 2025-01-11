@@ -26,7 +26,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -59,7 +59,6 @@ def create_tables_command():
     confirmation_prompt=True,
 )
 def create_user_manual(username: str, password: str):
-    print(database_models.Base_decl.metadata)
     with Session(engine) as session:
         domain_user = database_models.User(
             username=username,
