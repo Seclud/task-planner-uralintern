@@ -2,9 +2,9 @@ from datetime import timedelta
 from fastapi import APIRouter, HTTPException, Depends, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session
-from dependencies import get_db, verify_password, create_access_token
-from config import Settings
-import database_models
+from app.dependencies import get_db, verify_password, create_access_token
+from app.config import Settings
+from app import database_models
 
 router = APIRouter()
 

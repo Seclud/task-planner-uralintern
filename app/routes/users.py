@@ -1,9 +1,9 @@
 import uuid
 from fastapi import APIRouter, HTTPException, Depends
 from sqlmodel import Session
-from dependencies import get_db, get_password_hash, get_current_user
-from pydantic_models import User, UserReg, UserUpdate
-import database_models
+from app.dependencies import get_db, get_password_hash, get_current_user
+from app.pydantic_models import User, UserReg, UserUpdate
+from app import database_models
 
 router = APIRouter()
 
@@ -70,7 +70,8 @@ def delete_user(user_id: uuid.UUID, db: Session = Depends(get_db)):
 @router.post("/users/signup")
 def register_user(user_in: UserReg, session: Session = Depends(get_db)):
     user = ((session.query(database_models.User)
-            .where((database_models.User.email == user_in.email) | (database_models.User.username == user_in.username)))
+             .where((database_models.User.email == user_in.email) | (
+                database_models.User.username == user_in.username)))
             .scalar())
     if user:
         raise HTTPException(

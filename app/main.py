@@ -1,20 +1,10 @@
-import uuid
-from typing import Annotated
-
-from fastapi import FastAPI, HTTPException, Depends, Response
-from datetime import timedelta
-from typing import List, Annotated
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import FastAPI
 
 import click
-from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy import select
 from sqlmodel import Session
 from fastapi.middleware.cors import CORSMiddleware
-import dependencies
 from config import Settings
-from dependencies import engine, get_password_hash, verify_password, get_current_user
-from pydantic_models import User, Project, Task, Token, LoginData, UserReg, ProjectCreate, TaskCreate
+from dependencies import engine, get_password_hash
 import database_models
 from routes import users, projects, tasks, auth, roles, comments
 

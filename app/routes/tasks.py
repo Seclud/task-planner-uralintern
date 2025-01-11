@@ -1,9 +1,9 @@
 import uuid
 from fastapi import APIRouter, HTTPException, Depends
 from sqlmodel import Session
-from dependencies import get_db, get_current_user
-from pydantic_models import Task, TaskCreate, User, TaskUpdate
-import database_models
+from app.dependencies import get_db, get_current_user
+from app.pydantic_models import Task, TaskCreate, User, TaskUpdate
+from app import database_models
 
 router = APIRouter()
 
