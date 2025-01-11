@@ -1,11 +1,11 @@
-import {useParams} from 'react-router-dom';
-import {useEffect, useState} from 'react';
-import {Badge, Button, Card, Container, Group, Text, Textarea} from '@mantine/core';
-import {useAuth} from "../contexts/AuthContext.jsx";
+import { useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Badge, Button, Card, Container, Group, Text, Textarea } from '@mantine/core';
+import { useAuth } from "../contexts/AuthContext.jsx";
 import TaskChangeModal from "../modals/TaskChangeModal.jsx";
 
 export default function TaskDetailPage() {
-    const {id} = useParams();
+    const { id } = useParams();
     const [task, setTask] = useState(null);
     const [assignedTo, setAssignedTo] = useState('');
     const [createdBy, setCreatedBy] = useState('');
@@ -53,7 +53,7 @@ export default function TaskDetailPage() {
         const commentsWithUsernames = await Promise.all(data.map(async (comment) => {
             const userResponse = await fetch(`http://127.0.0.1:8000/users/${comment.user_id}`);
             const userData = await userResponse.json();
-            return {...comment, username: userData.username};
+            return { ...comment, username: userData.username };
         }));
         setComments(commentsWithUsernames);
     };
@@ -66,7 +66,7 @@ export default function TaskDetailPage() {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({content: newComment, task_id: id, user_id: auth.user.id})
+            body: JSON.stringify({ content: newComment, task_id: id, user_id: auth.user.id })
         });
         if (response.ok) {
             setNewComment('');
@@ -96,11 +96,11 @@ export default function TaskDetailPage() {
 
     return (
         <Container>
-            <Card shadow="sm" padding="lg" radius="md" withBorder>
+            <Card padding="lg" radius="md" withBorder style={{ marginBottom: '20px' }}>
                 <Group position="apart" justify="space-between">
                     <div>
-                        <Text weight={500} size="xl">Название: {task.title}</Text>
-                        <Text size="sm" color="dimmed">Описание : {task.description} </Text>
+                        <Text weight={500} size="xl">{task.title}</Text>
+                        <Text size="sm" color="dimmed">{task.description} </Text>
                         <Badge color="green" variant="light">
                             До: {task.due_date}
                         </Badge>
@@ -114,10 +114,12 @@ export default function TaskDetailPage() {
                             Автор: {createdBy}
                         </Badge>
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                        <Button color="yellow" onClick={() => setIsModalOpen(true)} style={{ marginBottom: 10 }}>Изменить</Button>
-                        <Button color="red" onClick={deleteTask}>Удалить</Button>
-                    </div>
+                    {auth.user.role !== 3 && (
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                            <Button color="yellow" onClick={() => setIsModalOpen(true)} style={{ marginBottom: 10 }}>Изменить</Button>
+                            <Button color="red" onClick={deleteTask}>Удалить</Button>
+                        </div>
+                    )}
                 </Group>
             </Card>
             <Card shadow="sm" padding="lg" radius="md" withBorder>
@@ -129,12 +131,15 @@ export default function TaskDetailPage() {
                 ))}
             </Card>
             <Card>
-                <Textarea
-                    placeholder="Добавить комментарий"
-                    value={newComment}
-                    onChange={(event) => setNewComment(event.currentTarget.value)}
-                />
-                <Button onClick={handleAddComment} disabled={!newComment}>Добавить комментарий</Button>
+                <Group align="flex-end">
+                    <Textarea
+                        placeholder="Добавить комментарий"
+                        value={newComment}
+                        onChange={(event) => setNewComment(event.currentTarget.value)}
+                        style={{ flexGrow: 1 }}
+                    />
+                    <Button onClick={handleAddComment} disabled={!newComment}>Добавить комментарий</Button>
+                </Group>
             </Card>
             <TaskChangeModal
                 isOpen={isModalOpen}
@@ -145,6 +150,7 @@ export default function TaskDetailPage() {
                 dueDate={task.due_date}
                 status={task.status}
                 assignedTo={task.assigned_to}
+                projectId={task.project_id}
             />
         </Container>
     );
