@@ -15,18 +15,14 @@ def create_tables():
 app = FastAPI()
 
 origins = [
-    "http://localhost:5173",
-    "http://localhost:8000",
-    "http://localhost",
-    "https://planningpro.up.railway.app",
-    "https://backend-production-d986.up.railway.app",
+    "*"
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
