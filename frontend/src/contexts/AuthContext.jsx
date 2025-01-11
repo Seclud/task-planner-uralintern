@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import {BACKEND_URL} from "../main.jsx";
 
 const AuthContext = createContext(null);
 
@@ -13,7 +14,7 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         if (isAuthenticated) {
-            fetch('http://127.0.0.1:8000/users_login/me', {
+            fetch(`${BACKEND_URL}/users_login/me`, {
                 method: 'GET',
                 credentials: 'include',
                 headers: {

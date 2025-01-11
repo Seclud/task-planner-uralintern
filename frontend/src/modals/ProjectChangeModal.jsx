@@ -2,6 +2,7 @@ import { Button, Space, Text, TextInput, Title, Modal, Stack, MultiSelect } from
 import { DatePickerInput } from "@mantine/dates";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import {BACKEND_URL} from "../main.jsx";
 
 export default function ProjectChangeModal(props) {
     const navigate = useNavigate();
@@ -14,7 +15,7 @@ export default function ProjectChangeModal(props) {
     const [users, setUsers] = useState([]);
 
     useEffect(() => {
-        fetch('http://127.0.0.1:8000/users/', {
+        fetch(`${BACKEND_URL}/users/`, {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -44,7 +45,7 @@ export default function ProjectChangeModal(props) {
         };
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/projects/${props.projectId}/`, {
+            const response = await fetch(`${BACKEND_URL}/projects/${props.projectId}/`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

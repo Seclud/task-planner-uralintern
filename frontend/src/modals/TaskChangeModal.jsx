@@ -15,7 +15,7 @@ export default function TaskChangeModal(props) {
     const [statuses, setStatuses] = useState([]);
 
     useEffect(() => {
-        fetch(`http://127.0.0.1:8000/projects/${props.projectId}/participants`, {
+        fetch(`${BACKEND_URL}/projects/${props.projectId}/participants`, {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -26,7 +26,7 @@ export default function TaskChangeModal(props) {
             .then(data => setUsers(data))
             .catch(error => console.error('Error fetching users:', error));
 
-        fetch(`http://127.0.0.1:8000/projects/${props.projectId}/`, {
+        fetch(`${BACKEND_URL}/projects/${props.projectId}/`, {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -56,7 +56,7 @@ export default function TaskChangeModal(props) {
         };
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/tasks/${props.taskId}/`, {
+            const response = await fetch(`${BACKEND_URL}/tasks/${props.taskId}/`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

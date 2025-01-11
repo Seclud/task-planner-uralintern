@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { DatePickerInput } from '@mantine/dates';
 import '@mantine/dates/styles.css';
 import { useAuth } from "../contexts/AuthContext.jsx";
+import {BACKEND_URL} from "../main.jsx";
 
 export default function TaskCreateModal({ isOpen, setIsOpen, projectId, defaultStatus }) {
     const navigate = useNavigate();
@@ -16,7 +17,7 @@ export default function TaskCreateModal({ isOpen, setIsOpen, projectId, defaultS
     const [users, setUsers] = useState([]);
 
     useEffect(() => {
-        fetch(`http://127.0.0.1:8000/projects/${projectId}/participants`, {
+        fetch(`${BACKEND_URL}/projects/${projectId}/participants`, {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -47,7 +48,7 @@ export default function TaskCreateModal({ isOpen, setIsOpen, projectId, defaultS
         };
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/tasks/`, {
+            const response = await fetch(`${BACKEND_URL}/tasks/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

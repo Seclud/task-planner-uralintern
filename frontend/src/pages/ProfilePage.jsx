@@ -3,7 +3,8 @@ import { Button, Paper, Space, Text, Title, Container } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 import UserChangeModal from "../modals/UserChangeModal.jsx"
 import { useState } from "react";
-// import styles from "./ProfilePage.module.css";
+// import styles from "./ProfilePage.module.css";\
+import { BACKEND_URL } from '../main.jsx';
 
 export default function ProfilePage() {
     const { user, logout } = useAuth();
