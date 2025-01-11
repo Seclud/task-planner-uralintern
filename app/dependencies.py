@@ -5,7 +5,6 @@ from typing import Annotated
 
 import jwt
 from fastapi import HTTPException, status, Depends
-from jwt import InvalidTokenError
 from pydantic import ValidationError
 from sqlalchemy import create_engine
 from sqlmodel import Session
@@ -42,7 +41,7 @@ def get_current_user(session:SessionDep, token:TokenDep) -> User:
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         token_data = payload["sub"]
-    except(InvalidTokenError, ValidationError):
+    except(jwt.exceptions.InvalidTokenError, ValidationError):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Could not validate credentials")
     user = session.query(database_models.User).filter(database_models.User.id == token_data).first()
     if not user:
