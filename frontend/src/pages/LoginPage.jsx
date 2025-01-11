@@ -45,7 +45,7 @@ export default function LoginPage() {
         <div className={styles.wrapper}>
             <Paper className={styles.form} radius={0} p={30}>
                 <Title order={2} ta="center" mt="md" mb={50}>
-                    👋 C возвращением!
+                    Добро пожаловать
                 </Title>
 
                 <TextInput

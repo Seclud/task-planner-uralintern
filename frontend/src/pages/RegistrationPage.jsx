@@ -44,12 +44,14 @@ function RegistrationPage() {
             }
             setErrorMessage('');
 
-            notifications.show({
-                title: 'Аккаунт зарегистрирован',
-                color: 'green',
-                autoClose: 15000,
-                onClose: () => navigate('/login')
-            });
+            // notifications.show({
+            //     title: 'Аккаунт зарегистрирован',
+            //     color: 'green',
+            //     autoClose: 15000,
+            //     onClose: () => navigate('/login')
+            // });
+            notifications.show({ message: 'Аккаунт зарегистрирован', color: 'green' });
+            navigate('/login');
         } catch (error) {
             console.error('Registration error:', error);
             setErrorMessage(error.message)
@@ -60,12 +62,13 @@ function RegistrationPage() {
         <div className={styles.wrapper}>
             <Paper className={styles.form} radius={0} p={30}>
                 <Title order={2} className={styles.title} ta="center" mt="md" mb={50}>
-                    👋 Добро пожаловать!
+                    Регистрация
                 </Title>
 
                 <TextInput
                     label="Имя"
                     placeholder="Имя пользователя"
+                    mt="md"
                     size="md"
                     value={username}
                     onChange={(event) => setUsername(event.currentTarget.value)}
@@ -74,6 +77,7 @@ function RegistrationPage() {
                 <TextInput
                     label="Почта"
                     placeholder="hello@gmail.com"
+                    mt="md"
                     size="md"
                     value={email}
                     onChange={(event) => setEmail(event.currentTarget.value)}
@@ -82,6 +86,7 @@ function RegistrationPage() {
                 <TextInput
                     label="Телефон"
                     placeholder="+79000000000"
+                    mt="md"
                     size="md"
                     value={phone}
                     onChange={(event) => setPhone(event.currentTarget.value)}

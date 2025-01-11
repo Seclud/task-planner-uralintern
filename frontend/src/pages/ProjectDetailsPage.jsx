@@ -1,14 +1,13 @@
 import { Link, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Badge, Button, Card, Group, SimpleGrid, Space, Text, Divider, ScrollArea, Paper } from '@mantine/core';
-import PropTypes from 'prop-types';
 import TaskCreateModal from '../modals/TaskCreateModal.jsx';
 import ProjectChangeModal from '../modals/ProjectChangeModal.jsx';
 import AddColumnModal from '../modals/AddColumnModal.jsx';
 import { useAuth } from "../contexts/AuthContext.jsx";
 
 
-function TaskList({ title, tasks, onTaskDragStart, onTaskDragOver, onTaskDrop, removeColumn, isEditMode, moveColumnLeft, moveColumnRight, index, totalColumns, showOldTasks, completedStatus }) {
+function TaskList({ title, tasks, onTaskDragStart, onTaskDragOver, onTaskDrop, removeColumn, isEditMode, moveColumnLeft, moveColumnRight, index, totalColumns, showOldTasks, completedStatus, hiddenOldTasksCount }) {
     const filteredTasks = tasks.filter(task => {
         const statusChangeDate = new Date(task.updated_at);
         const threeDaysAgo = new Date();
@@ -23,6 +22,9 @@ function TaskList({ title, tasks, onTaskDragStart, onTaskDragOver, onTaskDrop, r
             style={{ minWidth: 300, flexGrow: 1 }}
         >
             <h1>{title}</h1>
+            {title === completedStatus && !showOldTasks && (
+                <Text size="sm" color="dimmed">Скрыто задач: {hiddenOldTasksCount}</Text>
+            )}
             {isEditMode && (
                 <Group position="center" style={{ marginBottom: 10 }}>
                     <Button color="blue" size="xs" onClick={() => moveColumnLeft(index)} disabled={index === 0}>
@@ -32,7 +34,7 @@ function TaskList({ title, tasks, onTaskDragStart, onTaskDragOver, onTaskDrop, r
                         →
                     </Button>
                     <Button color="red" size="xs" onClick={() => removeColumn(title)}>
-                        Remove
+                        Удалить
                     </Button>
                 </Group>
             )}
@@ -127,25 +129,31 @@ function ProjectDetailsPage() {
         setParticipants(data);
     };
 
+    const refreshProjectDetails = () => {
+        fetchProject();
+        fetchTasks();
+        fetchParticipants();
+    };
+
     useEffect(() => {
         fetchProject();
         fetchTasks();
         fetchParticipants();
     }, [id]);
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            const updatedTasks = tasks.map((task) => {
-                if (new Date(task.due_date) < new Date() && task.status !== 'completed') {
-                    task.status = 'Просроченные';
-                }
-                return task;
-            });
-            setTask(updatedTasks);
-        }, 60000); // Check every minute
+    // useEffect(() => {
+    //     const interval = setInterval(() => {
+    //         const updatedTasks = tasks.map((task) => {
+    //             if (new Date(task.due_date) < new Date() && task.status !== 'completed') {
+    //                 task.status = 'Просроченные';
+    //             }
+    //             return task;
+    //         });
+    //         setTask(updatedTasks);
+    //     }, 60000); // Check every minute
 
-        return () => clearInterval(interval);
-    }, [tasks]);
+    //     return () => clearInterval(interval);
+    // }, [tasks]);
 
     useEffect(() => {
         const countHiddenOldTasks = () => {
@@ -319,11 +327,11 @@ function ProjectDetailsPage() {
                             >
                                 {isEditMode ? 'Сохранить' : 'Изменить статусы задач'}
                             </Button>
-                            {!showOldTasks && (
+                            {/* {!showOldTasks && (
                                 <Badge color="gray" variant="light">
                                     Скрытых задач{hiddenOldTasksCount}
                                 </Badge>
-                            )}
+                            )} */}
                             <Button onClick={() => setShowOldTasks(!showOldTasks)}>
                                 {showOldTasks ? 'Скрыть старые завершенные задачи' : 'Показать старые завершенные задачи'}
                             </Button>
@@ -352,14 +360,26 @@ function ProjectDetailsPage() {
                             totalColumns={statuses.length}
                             showOldTasks={showOldTasks}
                             completedStatus={completedStatus}
+                            hiddenOldTasksCount={hiddenOldTasksCount}
                         />
                     ))}
                 </div>
             </ScrollArea.Autosize>
-            <TaskCreateModal isOpen={isTaskCreateModalOpen} setIsOpen={setIsTaskCreateModalOpen} projectId={id} />
+            <TaskCreateModal 
+                isOpen={isTaskCreateModalOpen} 
+                setIsOpen={(isOpen) => {
+                    setIsTaskCreateModalOpen(isOpen);
+                    if (!isOpen) refreshProjectDetails();
+                }} 
+                projectId={id} 
+                defaultStatus={statuses[0]} 
+            />
             <ProjectChangeModal
                 isOpen={isProjectChangeModalOpen}
-                setIsOpen={setIsProjectChangeModalOpen}
+                setIsOpen={(isOpen) => {
+                    setIsProjectChangeModalOpen(isOpen);
+                    if (!isOpen) refreshProjectDetails();
+                }}
                 projectId={id}
                 name={project.name}
                 description={project.description}
@@ -369,7 +389,10 @@ function ProjectDetailsPage() {
             />
             <AddColumnModal
                 isOpen={isAddColumnModalOpen}
-                setIsOpen={setIsAddColumnModalOpen}
+                setIsOpen={(isOpen) => {
+                    setIsAddColumnModalOpen(isOpen);
+                    if (!isOpen) refreshProjectDetails();
+                }}
                 addColumn={addColumn}
             />
         </div>

@@ -5,12 +5,12 @@ import { DatePickerInput } from '@mantine/dates';
 import '@mantine/dates/styles.css';
 import { useAuth } from "../contexts/AuthContext.jsx";
 
-export default function TaskCreateModal({ isOpen, setIsOpen, projectId }) {
+export default function TaskCreateModal({ isOpen, setIsOpen, projectId, defaultStatus }) {
     const navigate = useNavigate();
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const [end_date, setEndDate] = useState('');
+    const [end_date, setEndDate] = useState(null);
     const auth = useAuth();
     const [assigned, setAssigned] = useState('');
     const [users, setUsers] = useState([]);
@@ -29,6 +29,7 @@ export default function TaskCreateModal({ isOpen, setIsOpen, projectId }) {
     }, [projectId]);
 
     const formatDate = (date) => {
+        if (!date) return null;
         return date.toISOString().split('T')[0];
     };
 
@@ -38,7 +39,7 @@ export default function TaskCreateModal({ isOpen, setIsOpen, projectId }) {
         const task = {
             title,
             description,
-            status: "open",
+            status: defaultStatus,
             due_date: formatDate(end_date),
             created_by: auth.user.id,
             project_id: projectId,
@@ -88,7 +89,7 @@ export default function TaskCreateModal({ isOpen, setIsOpen, projectId }) {
                     onChange={(e) => setDescription(e.target.value)}
                 />
                 <DatePickerInput
-                    label="Конечная дата"
+                    label="Крайний срок"
                     placeholder="dd.mm.year"
                     value={end_date}
                     onChange={setEndDate}

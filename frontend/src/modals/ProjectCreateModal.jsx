@@ -10,8 +10,8 @@ export default function ProjectCreateModal(props) {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const [start_date, setStartDate] = useState('');
-    const [end_date, setEndDate] = useState('');
+    const [start_date, setStartDate] = useState(null);
+    const [end_date, setEndDate] = useState(null);
     const auth = useAuth();
     const [participants, setParticipants] = useState([]);
     const [users, setUsers] = useState([]);
@@ -30,6 +30,7 @@ export default function ProjectCreateModal(props) {
     }, []);
 
     const formatDate = (date) => {
+        if (!date) return null;
         return date.toISOString().split('T')[0];
     };
 

@@ -15,7 +15,7 @@ export default function TaskChangeModal(props) {
     const [statuses, setStatuses] = useState([]);
 
     useEffect(() => {
-        fetch('http://127.0.0.1:8000/users/', {
+        fetch(`http://127.0.0.1:8000/projects/${props.projectId}/participants`, {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -98,7 +98,7 @@ export default function TaskChangeModal(props) {
                     value={description}
                 />
                 <DatePickerInput
-                    label="Дата выполнения"
+                    label="Крайний срок"
                     placeholder="Выберите новую дату выполнения"
                     onChange={setDueDate}
                     value={dueDate}

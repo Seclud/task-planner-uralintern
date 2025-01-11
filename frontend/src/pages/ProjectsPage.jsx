@@ -25,6 +25,10 @@ function ProjectsPage() {
         setProjects(response);
     };
 
+    const refreshProjects = () => {
+        getApiData();
+    };
+
     useEffect(() => {
         getApiData();
     }, []);
@@ -33,7 +37,7 @@ function ProjectsPage() {
         <Container>
             <Paper shadow="xs" padding="md" radius="md" style={{ backgroundColor: '#f8f9fa', width: '100%' }}>
                 {projects.length === 0 ? (
-                    <Text>Вы не участвуете ни в одном проекте</Text>
+                    <Text style={{ marginLeft: '10px' }}>Вы не участвуете ни в одном проекте</Text>
                 ) : (
                     projects.map((project, index) => (
                         <Button
@@ -61,11 +65,19 @@ function ProjectsPage() {
                     ))
                 )}
                 {auth.user && auth.user.role !== 3 && (
-                    <Button color="blue" mt="md" radius="md" onClick={() => setIsOpen(true)}>
-                        Создать Проект
-                    </Button>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button color="blue" mt="md" radius="md" onClick={() => setIsOpen(true)} style={{ marginBottom: '5px', marginRight: '5px' }}>
+                            Создать Проект
+                        </Button>
+                    </div>
                 )}
-                <ProjectCreateModal isOpen={isOpen} setIsOpen={setIsOpen} />
+                <ProjectCreateModal
+                    isOpen={isOpen}
+                    setIsOpen={(isOpen) => {
+                        setIsOpen(isOpen);
+                        if (!isOpen) refreshProjects();
+                    }}
+                />
             </Paper>
         </Container>
     );

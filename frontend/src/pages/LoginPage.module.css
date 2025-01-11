@@ -11,6 +11,7 @@
 .form {
     min-height: 900px;
     max-width: 450px;
+    min-width: 350px;
     padding-top: 80px;
     @media (max-width: 48em) {
         max-width: 100%;

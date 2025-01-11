@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { Badge, Button, Card, Container, Group, Text, Textarea } from '@mantine/core';
 import { useAuth } from "../contexts/AuthContext.jsx";
 import TaskChangeModal from "../modals/TaskChangeModal.jsx";
+import { useNavigate } from 'react-router-dom';
+import { notifications } from '@mantine/notifications';
 
 export default function TaskDetailPage() {
     const { id } = useParams();
@@ -13,7 +15,8 @@ export default function TaskDetailPage() {
     const [newComment, setNewComment] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const auth = useAuth();
-
+    const navigate = useNavigate();
+    const [participants, setParticipants] = useState([]);
 
     const statusMap = {
         'open': 'Новая задача',
@@ -34,6 +37,7 @@ export default function TaskDetailPage() {
         setTask(data);
         fetchUser(data.assigned_to, setAssignedTo);
         fetchUser(data.created_by, setCreatedBy);
+        fetchProjectParticipants(data.project_id);
     };
 
     const fetchUser = async (userId, setUser) => {
@@ -45,6 +49,25 @@ export default function TaskDetailPage() {
         });
         const data = await response.json();
         setUser(data.username);
+    };
+
+    const fetchProjectParticipants = async (projectId) => {
+        const token = localStorage.getItem('authToken');
+        const response = await fetch(`http://127.0.0.1:8000/projects/${projectId}/participants`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const data = await response.json();
+        setParticipants(data);
+
+        if (auth.user.role === 3) {
+            const isInProject = data.some(p => p.id === auth.user.id);
+            if (!isInProject) {
+                notifications.show({ message: 'Вы не являетесь участником проекта', color: 'red' });
+                navigate('/projects');
+            }
+        }
     };
 
     const fetchComments = async () => {
@@ -88,7 +111,7 @@ export default function TaskDetailPage() {
     useEffect(() => {
         fetchTask();
         fetchComments();
-    }, [id]);
+    }, [id, isModalOpen]);
 
     if (!task) {
         return <div>Loading...</div>;
@@ -101,17 +124,17 @@ export default function TaskDetailPage() {
                     <div>
                         <Text weight={500} size="xl">{task.title}</Text>
                         <Text size="sm" color="dimmed">{task.description} </Text>
-                        <Badge color="green" variant="light">
-                            До: {task.due_date}
-                        </Badge>
-                        <Badge color="blue" variant="light">
-                            Статус: {statusMap[task.status] || task.status}
+                        <Badge color="pink" variant="light">
+                            Автор: {createdBy}
                         </Badge>
                         <Badge color="pink" variant="light">
                             Исполнитель: {assignedTo}
                         </Badge>
-                        <Badge color="yellow" variant="light">
-                            Автор: {createdBy}
+                        <Badge color="blue" variant="light">
+                            Статус: {statusMap[task.status] || task.status}
+                        </Badge>
+                        <Badge color="green" variant="light">
+                            До: {task.due_date}
                         </Badge>
                     </div>
                     {auth.user.role !== 3 && (

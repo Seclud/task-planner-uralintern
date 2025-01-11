@@ -31,7 +31,7 @@ export default function Layout() {
                                 <Button variant="subtle" color="gray" size="md">Авторизоваться</Button>
                             </Link>
                             <Link to="registration">
-                                <Button variant="filled" color="indigo" size="md">Зарегистрироваться</Button>
+                                <Button variant="filled" size="md">Зарегистрироваться</Button>
                             </Link>
                         </Group>
                     }
