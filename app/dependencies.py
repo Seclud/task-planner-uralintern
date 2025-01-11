@@ -5,7 +5,7 @@ from typing import Annotated
 
 import jwt
 from fastapi import HTTPException, status, Depends
-from jwt.exceptions import InvalidTokenError
+from jwt import InvalidTokenError
 from pydantic import ValidationError
 from sqlalchemy import create_engine
 from sqlmodel import Session
