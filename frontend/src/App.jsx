@@ -8,7 +8,6 @@ import LoginPage from "./pages/LoginPage.jsx";
 import AllTasksPage from "./pages/AllTasksPage.jsx";
 import TaskDetailPage from "./pages/TaskDetailPage.jsx";
 import RegistrationPage from "./pages/RegistrationPage.jsx";
-import TestPage from './pages/TestPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
 import AdminUsersPage from './pages/AdminUsersPage.jsx';
 import AllProjectsPage from './pages/AllProjectsPage.jsx';
