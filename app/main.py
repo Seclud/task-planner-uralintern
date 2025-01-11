@@ -19,6 +19,7 @@ origins = [
     "http://localhost:8000",
     "http://localhost",
     "https://planningpro.up.railway.app",
+    "https://backend-production-d986.up.railway.app",
 ]
 
 app.add_middleware(
