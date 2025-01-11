@@ -56,7 +56,7 @@ class ProjectCreate(BaseModel):
     end_date: Optional[date] = Field(title='Project End Date')
     created_by: uuid.UUID = Field(title="Создатель проекта")
     participants: list[uuid.UUID] = Field(title="Участники проекта")
-    statuses: list[str] = Field(default=["Просроченные", "Новые задачи", "В процессе", "Ревью", "Завершенные"],
+    statuses: list[str] = Field(default=["Новые задачи", "В процессе", "Ревью", "Завершенные"],
                                 title="Статусы задач")
 
 
