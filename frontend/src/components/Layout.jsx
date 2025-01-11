@@ -10,6 +10,9 @@ export default function Layout() {
         <AppShell padding="md" header={{height: 74}}>
             <AppShell.Header>
                 <div className={styles.header}>
+                    <Link to="all-projects">
+                        <Button variant="subtle" color="rgba(82, 82, 82, 1)" size="md">Все Проекты</Button>
+                    </Link>
                     <Link to="projects">
                         <Button variant="subtle" color="rgba(82, 82, 82, 1)" size="md">Мои Проекты</Button>
                     </Link>
