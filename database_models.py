@@ -62,7 +62,7 @@ class Project(Base_UUID):
     end_date: Mapped[datetime] = mapped_column(sa.Date, nullable=True, comment='Дата окончания')
     created_by: Mapped[uuid.UUID] = mapped_column(nullable=False, comment="Создатель проекта")
     participants: Mapped[list["User"]] = relationship(secondary='user_project_link', back_populates='projects')
-    statuses: Mapped[list[str]] = mapped_column(sa.ARRAY(sa.String), default=["Новые задачи", "В процессе", "Ревью", "Завершенные", "Просроченные"], comment='Статусы задач')
+    statuses: Mapped[list[str]] = mapped_column(sa.ARRAY(sa.String), default=["Новые задачи", "В процессе", "Ревью", "Завершенные"], comment='Статусы задач')
 
 class Task(Base_UUID):
     __tablename__ = 'tasks'
