@@ -10,7 +10,8 @@ import TaskDetailPage from "./pages/TaskDetailPage.jsx";
 import RegistrationPage from "./pages/RegistrationPage.jsx";
 import TestPage from './pages/TestPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
-import AdminUsersPage from './pages/AdminUsersPage';
+import AdminUsersPage from './pages/AdminUsersPage.jsx';
+import AllProjectsPage from './pages/AllProjectsPage.jsx';
 import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
 import { Notifications } from "@mantine/notifications";
 import AdminRoute from './components/AdminRoute';
@@ -29,6 +30,7 @@ export default function App() {
                     <Route element={<Layout />}>
                         <Route path="/projects" element={<PrivateRoute><ProjectsPage /></PrivateRoute>} />
                         <Route path="/projects/:id" element={<PrivateRoute><ProjectDetailsPage /></PrivateRoute>} />
+                        <Route path="/all-projects" element={<PrivateRoute><AllProjectsPage /></PrivateRoute>} />
                         <Route path="/tasks" element={<PrivateRoute><AllTasksPage /></PrivateRoute>} />
                         <Route path="/tasks/:id" element={<PrivateRoute><TaskDetailPage /></PrivateRoute>} />
                         <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
