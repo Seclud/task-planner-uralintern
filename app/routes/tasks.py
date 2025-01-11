@@ -37,7 +37,6 @@ def read_tasks(project_id: uuid.UUID, current_user: User = Depends(get_current_u
     db_tasks = db.query(database_models.Task).filter(
         database_models.Task.project_id == project_id,
     ).all()
-    print(db_tasks)
     return db_tasks
 
 @router.put("/tasks/{task_id}")
@@ -52,12 +51,7 @@ def update_task(task_id: uuid.UUID, updated_task: TaskUpdate, db: Session = Depe
     db_task.assigned_to = updated_task.assigned_to
     db.commit()
     db.refresh(db_task)
-    
-    # db_activity_log = database_models.ActivityLog(
-    #     user_id=db_task.assigned_to,
-    #     action=f"Task status with id {db_task.id} updated to {updated_task.status}"
-    # )
-    # db.add(db_activity_log)
+
     db.commit()
     
     return db_task
@@ -86,12 +80,5 @@ def read_task(task_id: uuid.UUID, current_user: User = Depends(get_current_user)
     if db_task is None:
         raise HTTPException(status_code=404, detail="Task not found")
     return db_task
-
-# @router.get("/tasks/{task_id}/activitylog", response_model=list[database_models.ActivityLog])
-# def get_task_activity_log(task_id: uuid.UUID, db: Session = Depends(get_db)):
-#     activity_logs = db.query(database_models.ActivityLog).filter(
-#         database_models.ActivityLog.action.like(f"Task status with id {task_id} updated to %")
-#     ).all()
-#     return activity_logs
 
 
