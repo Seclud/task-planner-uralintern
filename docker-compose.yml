@@ -26,6 +26,6 @@ services:
       dockerfile: Dockerfile
     container_name: frontend_app
     ports:
-      - "80:80"
+      - "5173:5173"
     depends_on:
       - app

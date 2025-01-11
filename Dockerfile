@@ -8,5 +8,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 ENV PYTHONPATH=/app
 
-# ...existing code...
+RUN chmod +x /app/start.sh
+
 CMD ["/app/start.sh"]
