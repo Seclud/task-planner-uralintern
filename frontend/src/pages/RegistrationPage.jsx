@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { notifications } from '@mantine/notifications';
 import styles from "./LoginPage.module.css";
 import '@mantine/notifications/styles.css';
+import { BACKEND_URL } from '../main.jsx';
 
 function RegistrationPage() {
     const [email, setEmail] = useState('');
@@ -30,7 +31,7 @@ function RegistrationPage() {
 
 
         try {
-            const response = await fetch(`http://localhost:8000/users/signup`, {
+            const response = await fetch(`${BACKEND_URL}/users/signup`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -44,12 +45,6 @@ function RegistrationPage() {
             }
             setErrorMessage('');
 
-            // notifications.show({
-            //     title: 'Аккаунт зарегистрирован',
-            //     color: 'green',
-            //     autoClose: 15000,
-            //     onClose: () => navigate('/login')
-            // });
             notifications.show({ message: 'Аккаунт зарегистрирован', color: 'green' });
             navigate('/login');
         } catch (error) {

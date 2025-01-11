@@ -5,7 +5,7 @@ import TaskCreateModal from '../modals/TaskCreateModal.jsx';
 import ProjectChangeModal from '../modals/ProjectChangeModal.jsx';
 import AddColumnModal from '../modals/AddColumnModal.jsx';
 import { useAuth } from "../contexts/AuthContext.jsx";
-
+import { BACKEND_URL } from '../main.jsx';
 
 function TaskList({ title, tasks, onTaskDragStart, onTaskDragOver, onTaskDrop, removeColumn, isEditMode, moveColumnLeft, moveColumnRight, index, totalColumns, showOldTasks, completedStatus, hiddenOldTasksCount }) {
     const filteredTasks = tasks.filter(task => {
@@ -81,7 +81,7 @@ function ProjectDetailsPage() {
 
     const fetchUser = async (userId) => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`http://127.0.0.1:8000/users/${userId}`, {
+        const response = await fetch(`${BACKEND_URL}/users/${userId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -92,7 +92,7 @@ function ProjectDetailsPage() {
     const fetchProject = async () => {
         const token = localStorage.getItem('authToken');
         const response = await fetch(
-            `http://127.0.0.1:8000/projects/${id}/`, {
+            `${BACKEND_URL}/projects/${id}/`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -104,7 +104,7 @@ function ProjectDetailsPage() {
 
     const fetchTasks = async () => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`http://127.0.0.1:8000/projects/${id}/tasks`, {
+        const response = await fetch(`${BACKEND_URL}/projects/${id}/tasks`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -120,7 +120,7 @@ function ProjectDetailsPage() {
 
     const fetchParticipants = async () => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`http://127.0.0.1:8000/projects/${id}/participants`, {
+        const response = await fetch(`${BACKEND_URL}/projects/${id}/participants`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -196,7 +196,7 @@ function ProjectDetailsPage() {
                 created_by: draggedTask.created_by.id
             };
 
-            await fetch(`http://127.0.0.1:8000/tasks/${draggedTask.id}/`, {
+            await fetch(`${BACKEND_URL}/tasks/${draggedTask.id}/`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -207,7 +207,7 @@ function ProjectDetailsPage() {
     };
 
     const deleteProject = async () => {
-        await fetch(`http://127.0.0.1:8000/projects/${id}/`, {
+        await fetch(`${BACKEND_URL}/projects/${id}/`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('authToken')}`
@@ -219,7 +219,7 @@ function ProjectDetailsPage() {
     const addColumn = async (statusKey) => {
         const updatedStatuses = [...statuses, statusKey];
         setStatuses(updatedStatuses);
-        await fetch(`http://127.0.0.1:8000/projects/${id}/`, {
+        await fetch(`${BACKEND_URL}/projects/${id}/`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -236,7 +236,7 @@ function ProjectDetailsPage() {
     const removeColumn = async (statusKey) => {
         const updatedStatuses = statuses.filter((status) => status !== statusKey);
         setStatuses(updatedStatuses);
-        await fetch(`http://127.0.0.1:8000/projects/${id}/`, {
+        await fetch(`${BACKEND_URL}/projects/${id}/`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -274,7 +274,7 @@ function ProjectDetailsPage() {
     };
 
     const saveColumnOrder = async () => {
-        await fetch(`http://127.0.0.1:8000/projects/${id}/`, {
+        await fetch(`${BACKEND_URL}/projects/${id}/`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

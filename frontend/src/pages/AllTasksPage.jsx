@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Table, Container, Text, Popover, Button, MultiSelect, Group, TextInput } from '@mantine/core';
 import { Link } from 'react-router-dom';
+import { BACKEND_URL } from '../main.jsx';
 
 export default function AllTasksPage() {
     const [tasks, setTasks] = useState([]);
@@ -15,7 +16,7 @@ export default function AllTasksPage() {
 
     const fetchTasks = async () => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`http://127.0.0.1:8000/tasks/`, {
+        const response = await fetch(`${BACKEND_URL}/tasks/`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -38,7 +39,7 @@ export default function AllTasksPage() {
 
     const fetchUser = async (userId) => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`http://127.0.0.1:8000/users/${userId}`, {
+        const response = await fetch(`${BACKEND_URL}/users/${userId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -49,7 +50,7 @@ export default function AllTasksPage() {
 
     const fetchProject = async (projectId) => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`http://127.0.0.1:8000/projects/${projectId}`, {
+        const response = await fetch(`${BACKEND_URL}/projects/${projectId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -60,7 +61,7 @@ export default function AllTasksPage() {
 
     const fetchUserRole = async () => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`http://127.0.0.1:8000/users/me`, {
+        const response = await fetch(`${BACKEND_URL}/users/me`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

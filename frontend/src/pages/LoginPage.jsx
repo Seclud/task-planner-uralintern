@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext.jsx";
 import { Paper, PasswordInput, Space, TextInput, Title, Text, Button, Group } from "@mantine/core";
 import styles from "./LoginPage.module.css";
+import { BACKEND_URL } from '../main.jsx';
 
 export default function LoginPage() {
     const [username, setName] = useState('');
@@ -22,7 +23,7 @@ export default function LoginPage() {
             body.append('username', username);
             body.append('password', password);
 
-            const response = await fetch(`http://127.0.0.1:8000/login/access-token`, {
+            const response = await fetch(`${BACKEND_URL}/login/access-token`, {
                 method: 'POST',
                 headers: headers,
                 body: body,

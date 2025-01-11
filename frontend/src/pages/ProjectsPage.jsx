@@ -4,6 +4,7 @@ import { Badge, Button, Group, Text, Container, Paper } from '@mantine/core';
 import { useEffect, useState } from "react";
 import ProjectCreateModal from "../modals/ProjectCreateModal.jsx";
 import { useAuth } from "../contexts/AuthContext.jsx";
+import { BACKEND_URL } from '../main.jsx';
 
 function ProjectsPage() {
     const defaultValue = [];
@@ -15,7 +16,7 @@ function ProjectsPage() {
     const getApiData = async () => {
         const token = localStorage.getItem('authToken');
         const response = await fetch(
-            "http://127.0.0.1:8000/projects/", {
+            `${BACKEND_URL}/projects/`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

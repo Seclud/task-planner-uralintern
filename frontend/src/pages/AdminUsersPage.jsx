@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Table, Button, Group, Text, Select, TextInput, Container } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
+import { BACKEND_URL } from '../main.jsx';
 
 const roleNames = {
     0: 'Admin',
@@ -19,7 +20,7 @@ function AdminUsersPage() {
 
     const fetchUsers = async () => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch('http://127.0.0.1:8000/users/', {
+        const response = await fetch(`${BACKEND_URL}/users/`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -43,7 +44,7 @@ function AdminUsersPage() {
 
     const handleSaveClick = async (userId) => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`http://127.0.0.1:8000/users/${userId}/`, {
+        const response = await fetch(`${BACKEND_URL}/users/${userId}/`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -53,7 +54,7 @@ function AdminUsersPage() {
             ...userData,
             role: parseInt(selectedRole)
         };
-        await fetch(`http://127.0.0.1:8000/users/${userId}/`, {
+        await fetch(`${BACKEND_URL}/users/${userId}/`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

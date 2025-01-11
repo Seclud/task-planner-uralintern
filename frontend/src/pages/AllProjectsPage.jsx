@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import '@mantine/core/styles.css';
 import { Badge, Button, Group, Text, Container, Paper } from '@mantine/core';
 import { useEffect, useState } from "react";
+import { BACKEND_URL } from '../main.jsx';
 
 function AllProjectsPage() {
     const navigate = useNavigate();
@@ -10,7 +11,7 @@ function AllProjectsPage() {
     const getApiData = async () => {
         const token = localStorage.getItem('authToken');
         const response = await fetch(
-            "http://127.0.0.1:8000/projects/all", { // Updated endpoint
+            `${BACKEND_URL}/projects/all`, { // Updated endpoint
             headers: {
                 'Authorization': `Bearer ${token}`
             }

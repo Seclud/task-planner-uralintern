@@ -5,6 +5,7 @@ import { useAuth } from "../contexts/AuthContext.jsx";
 import TaskChangeModal from "../modals/TaskChangeModal.jsx";
 import { useNavigate } from 'react-router-dom';
 import { notifications } from '@mantine/notifications';
+import { BACKEND_URL } from '../main.jsx';
 
 export default function TaskDetailPage() {
     const { id } = useParams();
@@ -28,7 +29,7 @@ export default function TaskDetailPage() {
 
     const fetchTask = async () => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`http://127.0.0.1:8000/tasks/${id}/`, {
+        const response = await fetch(`${BACKEND_URL}/tasks/${id}/`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -42,7 +43,7 @@ export default function TaskDetailPage() {
 
     const fetchUser = async (userId, setUser) => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`http://127.0.0.1:8000/users/${userId}`, {
+        const response = await fetch(`${BACKEND_URL}/users/${userId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -53,7 +54,7 @@ export default function TaskDetailPage() {
 
     const fetchProjectParticipants = async (projectId) => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`http://127.0.0.1:8000/projects/${projectId}/participants`, {
+        const response = await fetch(`${BACKEND_URL}/projects/${projectId}/participants`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -71,10 +72,10 @@ export default function TaskDetailPage() {
     };
 
     const fetchComments = async () => {
-        const response = await fetch(`http://127.0.0.1:8000/comments/tasks/${id}`);
+        const response = await fetch(`${BACKEND_URL}/comments/tasks/${id}`);
         const data = await response.json();
         const commentsWithUsernames = await Promise.all(data.map(async (comment) => {
-            const userResponse = await fetch(`http://127.0.0.1:8000/users/${comment.user_id}`);
+            const userResponse = await fetch(`${BACKEND_URL}/users/${comment.user_id}`);
             const userData = await userResponse.json();
             return { ...comment, username: userData.username };
         }));
@@ -83,7 +84,7 @@ export default function TaskDetailPage() {
 
     const handleAddComment = async () => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`http://127.0.0.1:8000/comments/`, {
+        const response = await fetch(`${BACKEND_URL}/comments/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -98,7 +99,7 @@ export default function TaskDetailPage() {
     };
 
     const deleteTask = async () => {
-        await fetch(`http://127.0.0.1:8000/tasks/${id}/`, {
+        await fetch(`${BACKEND_URL}/tasks/${id}/`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('authToken')}`
