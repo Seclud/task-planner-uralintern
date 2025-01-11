@@ -11,10 +11,10 @@ from sqlalchemy import create_engine
 from sqlmodel import Session
 from fastapi.security import OAuth2PasswordBearer
 
-import database_models
-from config import Settings
+from . import database_models
+from .config import Settings
 from passlib.context import CryptContext
-from pydantic_models import User
+from .pydantic_models import User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

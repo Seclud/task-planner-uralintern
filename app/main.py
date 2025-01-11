@@ -3,10 +3,10 @@ from fastapi import FastAPI
 import click
 from sqlmodel import Session
 from fastapi.middleware.cors import CORSMiddleware
-from config import Settings
-from dependencies import engine, get_password_hash
-import database_models
-from routes import users, projects, tasks, auth, roles, comments
+from .config import Settings
+from .dependencies import engine, get_password_hash
+from . import database_models
+from .routes import users, projects, tasks, auth, roles, comments
 
 
 def create_tables():
