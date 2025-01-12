@@ -61,7 +61,7 @@ export default function AllTasksPage() {
 
     const fetchUserRole = async () => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`${BACKEND_URL}/users/me`, {
+        const response = await fetch(`${BACKEND_URL}/users_login/me`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
