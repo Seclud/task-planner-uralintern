@@ -29,7 +29,7 @@ export default function TaskDetailPage() {
 
     const fetchTask = async () => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`${BACKEND_URL}/tasks/${id}/`, {
+        const response = await fetch(`${BACKEND_URL}/tasks/${id}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -84,7 +84,7 @@ export default function TaskDetailPage() {
 
     const handleAddComment = async () => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`${BACKEND_URL}/comments/`, {
+        const response = await fetch(`${BACKEND_URL}/comments`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
