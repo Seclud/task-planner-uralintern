@@ -92,7 +92,7 @@ function ProjectDetailsPage() {
     const fetchProject = async () => {
         const token = localStorage.getItem('authToken');
         const response = await fetch(
-            `${BACKEND_URL}/projects/${id}/`, {
+            `${BACKEND_URL}/projects/${id}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
