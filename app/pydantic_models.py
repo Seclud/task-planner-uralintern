@@ -11,6 +11,7 @@ TaskId = typing.NewType('TaskId', uuid.UUID)
 FileId = typing.NewType('FileId', uuid.UUID)
 ActivityLogId = typing.NewType('ActivityLogId', uuid.UUID)
 CommentId = typing.NewType('CommentId', uuid.UUID)
+RequestId = typing.NewType('RequestId', uuid.UUID)
 
 
 class Role(BaseModel):
@@ -134,3 +135,20 @@ class Token(BaseModel):
 class LoginData(BaseModel):
     username: str
     password: str
+
+
+class Request(BaseModel):
+    id: RequestId = Field(title='Request Identifier')
+    user_id: UserId = Field(title='User Identifier')
+    project_id: ProjectId = Field(title='Project Identifier')
+    status: str = Field(title='Request Status')
+
+
+class RequestCreate(BaseModel):
+    user_id: UserId = Field(title='User Identifier')
+    project_id: ProjectId = Field(title='Project Identifier')
+    status: str = Field(title='Request Status')
+
+
+class RequestUpdate(BaseModel):
+    status: Optional[str] = Field(title='Request Status')

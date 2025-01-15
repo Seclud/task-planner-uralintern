@@ -98,3 +98,23 @@ class Comment(Base_UUID):
     user_id: Mapped[uuid.UUID] = mapped_column(sa_psql.UUID(as_uuid=True), sa.ForeignKey('users.id', ondelete='SET NULL'), comment='Идентификатор пользователя')
     content: Mapped[str] = mapped_column(nullable=False, comment='Содержание')
     created_at: Mapped[datetime] = mapped_column(sa.DateTime(timezone=True), default=utc_now, comment='Дата создания')
+
+class Request(Base_UUID):
+    __tablename__ = 'requests'
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        sa_psql.UUID(as_uuid=True), 
+        sa.ForeignKey('users.id'), 
+        nullable=False, 
+        comment='Идентификатор пользователя'
+    )
+    project_id: Mapped[uuid.UUID] = mapped_column(
+        sa_psql.UUID(as_uuid=True), 
+        sa.ForeignKey('projects.id'), 
+        nullable=False, 
+        comment='Идентификатор проекта'
+    )
+    status: Mapped[str] = mapped_column(
+        nullable=False, 
+        comment='Статус запроса'
+    )
