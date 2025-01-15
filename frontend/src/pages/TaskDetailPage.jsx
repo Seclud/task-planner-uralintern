@@ -19,6 +19,7 @@ export default function TaskDetailPage() {
     const navigate = useNavigate();
     const [participants, setParticipants] = useState([]);
     const [statuses, setStatuses] = useState({});
+    const [isUserAssigned, setIsUserAssigned] = useState(false);
 
     const fetchProjectStatuses = async (projectId) => {
         const token = localStorage.getItem('authToken');
@@ -71,8 +72,11 @@ export default function TaskDetailPage() {
         const data = await response.json();
         setParticipants(data);
 
+        console.log(auth.user.role)
+
         if (auth.user.role === 3) {
             const isInProject = data.some(p => p.id === auth.user.id);
+            setIsUserAssigned(true);
             if (!isInProject) {
                 notifications.show({ message: 'Вы не являетесь участником проекта', color: 'red' });
                 navigate('/projects');
@@ -147,7 +151,7 @@ export default function TaskDetailPage() {
                             До: {task.due_date}
                         </Badge>
                     </div>
-                    {auth.user.role !== 3 && (
+                    {isUserAssigned && (
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                             <Button color="yellow" onClick={() => setIsModalOpen(true)} style={{ marginBottom: 10 }}>Изменить</Button>
                             <Button color="red" onClick={deleteTask}>Удалить</Button>
