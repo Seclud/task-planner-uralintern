@@ -11,6 +11,7 @@ import RegistrationPage from "./pages/RegistrationPage.jsx";
 import ProfilePage from './pages/ProfilePage.jsx';
 import AdminUsersPage from './pages/AdminUsersPage.jsx';
 import AllProjectsPage from './pages/AllProjectsPage.jsx';
+import AdminRequestsPage from './pages/AdminRequestsPage.jsx';
 import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
 import { Notifications } from "@mantine/notifications";
 import AdminRoute from './components/AdminRoute';
@@ -37,6 +38,7 @@ export default function App() {
                         <Route path="/login" element={<LoginPage />} />
                         <Route path="/registration" element={<RegistrationPage />} />
                         <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
+                        <Route path="/admin/requests" element={<AdminRoute><AdminRequestsPage /></AdminRoute>} />
                     </Route>
                 </Routes>
             </MantineProvider>

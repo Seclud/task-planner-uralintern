@@ -289,6 +289,16 @@ function ProjectDetailsPage() {
         setIsEditMode(false);
     };
 
+    const sendJoinRequest = async () => {
+        await fetch(`${BACKEND_URL}/projects/${id}/join-request`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+            }
+        });
+        alert('Заявка на участие была отправлена');
+    };
+
     return (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
             <Group position="apart" justify="space-between">
@@ -338,6 +348,9 @@ function ProjectDetailsPage() {
                             
                         </Group>
                     </div>
+                )}
+                {auth.user.role === 3 && (
+                    <Button color="blue" onClick={sendJoinRequest}>Отправить заявку на участие</Button>
                 )}
             </Group>
             <Space h="md" />

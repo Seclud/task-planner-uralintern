@@ -20,9 +20,14 @@ export default function Layout() {
                         <Button variant="subtle" color="rgba(82, 82, 82, 1)" size="md">Список задач</Button>
                     </Link>
                     {isAuthenticated && user && user.role === 0 && (
-                        <Link to="admin/users">
-                            <Button variant="subtle" color="rgba(82, 82, 82, 1)" size="md">Список пользователей</Button>
-                        </Link>
+                        <>
+                            <Link to="admin/users">
+                                <Button variant="subtle" color="rgba(82, 82, 82, 1)" size="md">Список пользователей</Button>
+                            </Link>
+                            <Link to="admin/requests">
+                                <Button variant="subtle" color="rgba(82, 82, 82, 1)" size="md">Заявки на участие</Button>
+                            </Link>
+                        </>
                     )}
                     {
                         !isAuthenticated &&
