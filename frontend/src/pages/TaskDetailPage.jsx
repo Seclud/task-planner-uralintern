@@ -72,9 +72,7 @@ export default function TaskDetailPage() {
         const data = await response.json();
         setParticipants(data);
 
-        console.log(auth.user.role)
-
-        if (auth.user.role === 3) {
+        if (auth.user && auth.user.role === 3) {
             const isInProject = data.some(p => p.id === auth.user.id);
             setIsUserAssigned(true);
             if (!isInProject) {
@@ -123,12 +121,18 @@ export default function TaskDetailPage() {
     };
 
     useEffect(() => {
-        fetchTask();
-        fetchComments();
-    }, [id, isModalOpen]);
+        if (auth.user) {
+            fetchTask();
+            fetchComments();
+        }
+    }, [id, isModalOpen, auth.user]);
+
+    if (!auth.user) {
+        return <div>Загрузка...</div>;
+    }
 
     if (!task) {
-        return <div>Loading...</div>;
+        return <div>Загрузка...</div>;
     }
 
     return (

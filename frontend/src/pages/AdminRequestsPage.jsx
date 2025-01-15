@@ -102,7 +102,7 @@ function AdminRequestsPage() {
     }, []);
 
     if (auth.user.role !== 0) {
-        return <div>Access denied</div>;
+        return <div>Нет Доступа</div>;
     }
 
     const filteredRequests = requests.filter(request =>

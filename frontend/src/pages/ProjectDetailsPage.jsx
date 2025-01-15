@@ -353,10 +353,12 @@ function ProjectDetailsPage() {
     };
 
     useEffect(() => {
-        fetchProject();
-        fetchTasks();
-        fetchParticipants();
-    }, [id]);
+        if (auth.user) {
+            fetchProject();
+            fetchTasks();
+            fetchParticipants();
+        }
+    }, [id, auth.user]);
 
     useEffect(() => {
         const countHiddenOldTasks = () => {
@@ -368,6 +370,10 @@ function ProjectDetailsPage() {
 
         countHiddenOldTasks();
     }, [tasks, completedStatus]);
+
+    if (!auth.user) {
+        return <div>Загрузка...</div>;
+    }
 
     if (!project) {
         return <div>Loading...</div>;
