@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom';
+import {Link, useNavigate, useParams} from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Badge, Button, Card, Group, SimpleGrid, Space, Text, Divider, ScrollArea, Paper } from '@mantine/core';
 import TaskCreateModal from '../modals/TaskCreateModal.jsx';
@@ -76,6 +76,7 @@ function ProjectDetailsPage() {
     const [showOldTasks, setShowOldTasks] = useState(false);
     const [hiddenOldTasksCount, setHiddenOldTasksCount] = useState(0);
     const auth = useAuth();
+    const navigate = useNavigate();
 
     const completedStatus = statuses[statuses.length - 1];
 
@@ -196,7 +197,7 @@ function ProjectDetailsPage() {
                 created_by: draggedTask.created_by.id
             };
 
-            await fetch(`${BACKEND_URL}/tasks/${draggedTask.id}/`, {
+            await fetch(`${BACKEND_URL}/tasks/${draggedTask.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -207,19 +208,19 @@ function ProjectDetailsPage() {
     };
 
     const deleteProject = async () => {
-        await fetch(`${BACKEND_URL}/projects/${id}/`, {
+        await fetch(`${BACKEND_URL}/projects/${id}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('authToken')}`
             }
         });
-        window.location.href = '/projects';
+        navigate('/projects');
     };
 
     const addColumn = async (statusKey) => {
         const updatedStatuses = [...statuses, statusKey];
         setStatuses(updatedStatuses);
-        await fetch(`${BACKEND_URL}/projects/${id}/`, {
+        await fetch(`${BACKEND_URL}/projects/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -236,7 +237,7 @@ function ProjectDetailsPage() {
     const removeColumn = async (statusKey) => {
         const updatedStatuses = statuses.filter((status) => status !== statusKey);
         setStatuses(updatedStatuses);
-        await fetch(`${BACKEND_URL}/projects/${id}/`, {
+        await fetch(`${BACKEND_URL}/projects/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -274,7 +275,7 @@ function ProjectDetailsPage() {
     };
 
     const saveColumnOrder = async () => {
-        await fetch(`${BACKEND_URL}/projects/${id}/`, {
+        await fetch(`${BACKEND_URL}/projects/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

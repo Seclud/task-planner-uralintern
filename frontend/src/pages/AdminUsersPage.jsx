@@ -20,7 +20,7 @@ function AdminUsersPage() {
 
     const fetchUsers = async () => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`${BACKEND_URL}/users/`, {
+        const response = await fetch(`${BACKEND_URL}/users`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -44,7 +44,7 @@ function AdminUsersPage() {
 
     const handleSaveClick = async (userId) => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`${BACKEND_URL}/users/${userId}/`, {
+        const response = await fetch(`${BACKEND_URL}/users/${userId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

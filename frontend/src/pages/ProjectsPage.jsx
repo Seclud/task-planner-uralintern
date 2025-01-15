@@ -16,7 +16,7 @@ function ProjectsPage() {
     const getApiData = async () => {
         const token = localStorage.getItem('authToken');
         const response = await fetch(
-            `${BACKEND_URL}/projects/`, {
+            `${BACKEND_URL}/projects`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

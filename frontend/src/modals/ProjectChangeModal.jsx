@@ -15,7 +15,7 @@ export default function ProjectChangeModal(props) {
     const [users, setUsers] = useState([]);
 
     useEffect(() => {
-        fetch(`${BACKEND_URL}/users/`, {
+        fetch(`${BACKEND_URL}/users`, {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -45,7 +45,7 @@ export default function ProjectChangeModal(props) {
         };
 
         try {
-            const response = await fetch(`${BACKEND_URL}/projects/${props.projectId}/`, {
+            const response = await fetch(`${BACKEND_URL}/projects/${props.projectId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
