@@ -7,7 +7,7 @@ import AddColumnModal from '../modals/AddColumnModal.jsx';
 import { useAuth } from "../contexts/AuthContext.jsx";
 import { BACKEND_URL } from '../main.jsx';
 
-function TaskList({ title, tasks, onTaskDragStart, onTaskDragOver, onTaskDrop, removeColumn, isEditMode, moveColumnLeft, moveColumnRight, index, totalColumns, showOldTasks, completedStatus, hiddenOldTasksCount }) {
+function TaskList({ title, tasks, onTaskDragStart, onTaskDragOver, onTaskDrop, removeColumn, isEditMode, moveColumnLeft, moveColumnRight, index, totalColumns, showOldTasks, completedStatus, hiddenOldTasksCount, isDraggable }) {
     const filteredTasks = tasks.filter(task => {
         const statusChangeDate = new Date(task.updated_at);
         const threeDaysAgo = new Date();
@@ -17,8 +17,8 @@ function TaskList({ title, tasks, onTaskDragStart, onTaskDragOver, onTaskDrop, r
 
     return (
         <div
-            onDragOver={(e) => onTaskDragOver(e)}
-            onDrop={(e) => onTaskDrop(e, title)}
+            onDragOver={isDraggable ? (e) => onTaskDragOver(e) : null}
+            onDrop={isDraggable ? (e) => onTaskDrop(e, title) : null}
             style={{ minWidth: 300, flexGrow: 1 }}
         >
             <h1>{title}</h1>
@@ -41,13 +41,13 @@ function TaskList({ title, tasks, onTaskDragStart, onTaskDragOver, onTaskDrop, r
             {filteredTasks.map((task, index) => (
                 <Link to={`/tasks/${task.id}`} key={index} style={{ textDecoration: 'none' }}>
                     <Paper
-                        draggable
-                        onDragStart={(e) => onTaskDragStart(e, task)}
+                        draggable={isDraggable}
+                        onDragStart={isDraggable ? (e) => onTaskDragStart(e, task) : null}
                         shadow="sm"
                         padding="lg"
                         radius="md"
                         withBorder
-                        style={{ wordWrap: 'break-word', maxWidth: 300, cursor: 'pointer' }}
+                        style={{ wordWrap: 'break-word', maxWidth: 300, cursor: isDraggable ? 'pointer' : 'default' }}
                     >
                         <Text weight={500} style={{ wordWrap: 'break-word', padding: '5px' }}>{task.title}</Text>
                         <Badge color={new Date(task.due_date) < new Date() ? "red" : "green"} variant="light" style={{ padding: '5px' }}>
@@ -58,6 +58,223 @@ function TaskList({ title, tasks, onTaskDragStart, onTaskDragOver, onTaskDrop, r
                     </Paper>
                 </Link>
             ))}
+        </div>
+    );
+}
+
+function AdminProjectDetailsPage(props) {
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+            <Group position="apart" justify="space-between">
+                <div>
+                    <Text weight={500}>{props.project.name}</Text>
+                    <Space h="9px" />
+                    <Text size="sm" color="dimmed" >{props.project.description}</Text>
+                    <Group position="apart" style={{ marginTop: 15 }}>
+                        <Badge color="blue" variant="light">
+                            Начался: {props.project.start_date}
+                        </Badge>
+                        <Badge color="pink" variant="light">
+                            Закончится: {props.project.end_date}
+                        </Badge>
+                    </Group>
+                    <Text size="sm" color="dimmed">Участники: {props.participants.map(p => p.username).join(', ')}</Text>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                    <Group spacing="xs">
+                        <Button color="green" onClick={() => props.setIsTaskCreateModalOpen(true)}>Добавить задачу</Button>
+                        <Button color="yellow" onClick={() => props.setIsProjectChangeModalOpen(true)}>Изменить проект</Button>
+                        <Button color="red" onClick={props.deleteProject}>Удалить проект</Button>
+                    </Group>
+                    <Space h="md" />
+                    <Group spacing="xs">
+                        <Button onClick={() => props.setIsAddColumnModalOpen(true)}>Добавить статус задач</Button>
+                        <Button
+                            onClick={() => {
+                                if (props.isEditMode) {
+                                    props.saveColumnOrder();
+                                } else {
+                                    props.setIsEditMode(true);
+                                }
+                            }}
+                        >
+                            {props.isEditMode ? 'Сохранить' : 'Изменить статусы задач'}
+                        </Button>
+                        <Button onClick={() => props.setShowOldTasks(!props.showOldTasks)}>
+                            {props.showOldTasks ? 'Скрыть старые завершенные задачи' : 'Показать старые завершенные задачи'}
+                        </Button>
+                    </Group>
+                </div>
+            </Group>
+            <Space h="md" />
+            <Divider my="md" color="black" />
+            <ScrollArea.Autosize maxHeight="calc(100vh - 200px)" style={{ flexGrow: 1 }}>
+                <div style={{ display: 'flex', flexGrow: 1 }}>
+                    {props.statuses.length > 0 && props.statuses.map((status, index) => (
+                        <TaskList
+                            key={status}
+                            title={status}
+                            tasks={props.tasks.filter((task) => task.status === status)}
+                            onTaskDragStart={props.onTaskDragStart}
+                            onTaskDragOver={props.onTaskDragOver}
+                            onTaskDrop={props.onTaskDrop}
+                            removeColumn={props.removeColumnByTitle}
+                            isEditMode={props.isEditMode}
+                            moveColumnLeft={props.moveColumnLeft}
+                            moveColumnRight={props.moveColumnRight}
+                            index={index}
+                            totalColumns={props.statuses.length}
+                            showOldTasks={props.showOldTasks}
+                            completedStatus={props.completedStatus}
+                            hiddenOldTasksCount={props.hiddenOldTasksCount}
+                            isDraggable={true}
+                        />
+                    ))}
+                </div>
+            </ScrollArea.Autosize>
+            <TaskCreateModal 
+                isOpen={props.isTaskCreateModalOpen} 
+                setIsOpen={(isOpen) => {
+                    props.setIsTaskCreateModalOpen(isOpen);
+                    if (!isOpen) props.refreshProjectDetails();
+                }} 
+                projectId={props.id} 
+                defaultStatus={props.statuses[0]} 
+            />
+            <ProjectChangeModal
+                isOpen={props.isProjectChangeModalOpen}
+                setIsOpen={(isOpen) => {
+                    props.setIsProjectChangeModalOpen(isOpen);
+                    if (!isOpen) props.refreshProjectDetails();
+                }}
+                projectId={props.id}
+                name={props.project.name}
+                description={props.project.description}
+                startDate={props.project.start_date}
+                endDate={props.project.end_date}
+                participants={props.participants}
+            />
+            <AddColumnModal
+                isOpen={props.isAddColumnModalOpen}
+                setIsOpen={(isOpen) => {
+                    props.setIsAddColumnModalOpen(isOpen);
+                    if (!isOpen) props.refreshProjectDetails();
+                }}
+                addColumn={props.addColumn}
+            />
+        </div>
+    );
+}
+
+function UserProjectDetailsPage(props) {
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+            <Group position="apart" justify="space-between">
+                <div>
+                    <Text weight={500}>{props.project.name}</Text>
+                    <Space h="9px" />
+                    <Text size="sm" color="dimmed" >{props.project.description}</Text>
+                    <Group position="apart" style={{ marginTop: 15 }}>
+                        <Badge color="blue" variant="light">
+                            Начался: {props.project.start_date}
+                        </Badge>
+                        <Badge color="pink" variant="light">
+                            Закончится: {props.project.end_date}
+                        </Badge>
+                    </Group>
+                    <Text size="sm" color="dimmed">Участники: {props.participants.map(p => p.username).join(', ')}</Text>
+                </div>
+                <Button color="blue" onClick={props.sendJoinRequest}>Отправить заявку на участие</Button>
+            </Group>
+            <Space h="md" />
+            <Divider my="md" color="black" />
+            <ScrollArea.Autosize maxHeight="calc(100vh - 200px)" style={{ flexGrow: 1 }}>
+                <div style={{ display: 'flex', flexGrow: 1 }}>
+                    {props.statuses.length > 0 && props.statuses.map((status, index) => (
+                        <TaskList
+                            key={status}
+                            title={status}
+                            tasks={props.tasks.filter((task) => task.status === status)}
+                            onTaskDragStart={props.onTaskDragStart}
+                            onTaskDragOver={props.onTaskDragOver}
+                            onTaskDrop={props.onTaskDrop}
+                            removeColumn={props.removeColumnByTitle}
+                            isEditMode={props.isEditMode}
+                            moveColumnLeft={props.moveColumnLeft}
+                            moveColumnRight={props.moveColumnRight}
+                            index={index}
+                            totalColumns={props.statuses.length}
+                            showOldTasks={props.showOldTasks}
+                            completedStatus={props.completedStatus}
+                            hiddenOldTasksCount={props.hiddenOldTasksCount}
+                            isDraggable={false}
+                        />
+                    ))}
+                </div>
+            </ScrollArea.Autosize>
+        </div>
+    );
+}
+
+function AssignedUserProjectDetailsPage(props) {
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+            <Group position="apart" justify="space-between">
+                <div>
+                    <Text weight={500}>{props.project.name}</Text>
+                    <Space h="9px" />
+                    <Text size="sm" color="dimmed" >{props.project.description}</Text>
+                    <Group position="apart" style={{ marginTop: 15 }}>
+                        <Badge color="blue" variant="light">
+                            Начался: {props.project.start_date}
+                        </Badge>
+                        <Badge color="pink" variant="light">
+                            Закончится: {props.project.end_date}
+                        </Badge>
+                    </Group>
+                    <Text size="sm" color="dimmed">Участники: {props.participants.map(p => p.username).join(', ')}</Text>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                    <Group spacing="xs">
+                        <Button color="green" onClick={() => props.setIsTaskCreateModalOpen(true)}>Добавить задачу</Button>
+                    </Group>
+                </div>
+            </Group>
+            <Space h="md" />
+            <Divider my="md" color="black" />
+            <ScrollArea.Autosize maxHeight="calc(100vh - 200px)" style={{ flexGrow: 1 }}>
+                <div style={{ display: 'flex', flexGrow: 1 }}>
+                    {props.statuses.length > 0 && props.statuses.map((status, index) => (
+                        <TaskList
+                            key={status}
+                            title={status}
+                            tasks={props.tasks.filter((task) => task.status === status)}
+                            onTaskDragStart={props.onTaskDragStart}
+                            onTaskDragOver={props.onTaskDragOver}
+                            onTaskDrop={props.onTaskDrop}
+                            removeColumn={props.removeColumnByTitle}
+                            isEditMode={props.isEditMode}
+                            moveColumnLeft={props.moveColumnLeft}
+                            moveColumnRight={props.moveColumnRight}
+                            index={index}
+                            totalColumns={props.statuses.length}
+                            showOldTasks={props.showOldTasks}
+                            completedStatus={props.completedStatus}
+                            hiddenOldTasksCount={props.hiddenOldTasksCount}
+                            isDraggable={true}
+                        />
+                    ))}
+                </div>
+            </ScrollArea.Autosize>
+            <TaskCreateModal 
+                isOpen={props.isTaskCreateModalOpen} 
+                setIsOpen={(isOpen) => {
+                    props.setIsTaskCreateModalOpen(isOpen);
+                    if (!isOpen) props.refreshProjectDetails();
+                }} 
+                projectId={props.id} 
+                defaultStatus={props.statuses[0]} 
+            />
         </div>
     );
 }
@@ -140,20 +357,6 @@ function ProjectDetailsPage() {
         fetchTasks();
         fetchParticipants();
     }, [id]);
-
-    // useEffect(() => {
-    //     const interval = setInterval(() => {
-    //         const updatedTasks = tasks.map((task) => {
-    //             if (new Date(task.due_date) < new Date() && task.status !== 'completed') {
-    //                 task.status = 'Просроченные';
-    //             }
-    //             return task;
-    //         });
-    //         setTask(updatedTasks);
-    //     }, 60000); // Check every minute
-
-    //     return () => clearInterval(interval);
-    // }, [tasks]);
 
     useEffect(() => {
         const countHiddenOldTasks = () => {
@@ -299,117 +502,53 @@ function ProjectDetailsPage() {
         alert('Заявка на участие была отправлена');
     };
 
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-            <Group position="apart" justify="space-between">
-                <div>
-                    <Text weight={500}>{project.name}</Text>
-                    <Space h="9px" />
-                    <Text size="sm" color="dimmed" >{project.description}</Text>
-                    <Group position="apart" style={{ marginTop: 15 }}>
-                        <Badge color="blue" variant="light">
-                            Начался: {project.start_date}
-                        </Badge>
-                        <Badge color="pink" variant="light">
-                            Закончится: {project.end_date}
-                        </Badge>
-                    </Group>
-                    <Text size="sm" color="dimmed">Участники: {participants.map(p => p.username).join(', ')}</Text>
-                </div>
-                {auth.user.role !== 3 && (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                        <Group spacing="xs">
-                            <Button color="green" onClick={() => setIsTaskCreateModalOpen(true)}>Добавить задачу</Button>
-                            <Button color="yellow" onClick={() => setIsProjectChangeModalOpen(true)}>Изменить проект</Button>
-                            <Button color="red" onClick={deleteProject}>Удалить проект</Button>
-                        </Group>
-                        <Space h="md" />
-                        <Group spacing="xs">
-                            <Button onClick={() => setIsAddColumnModalOpen(true)}>Добавить статус задач</Button>
-                            <Button
-                                onClick={() => {
-                                    if (isEditMode) {
-                                        saveColumnOrder();
-                                    } else {
-                                        setIsEditMode(true);
-                                    }
-                                }}
-                            >
-                                {isEditMode ? 'Сохранить' : 'Изменить статусы задач'}
-                            </Button>
-                            {/* {!showOldTasks && (
-                                <Badge color="gray" variant="light">
-                                    Скрытых задач{hiddenOldTasksCount}
-                                </Badge>
-                            )} */}
-                            <Button onClick={() => setShowOldTasks(!showOldTasks)}>
-                                {showOldTasks ? 'Скрыть старые завершенные задачи' : 'Показать старые завершенные задачи'}
-                            </Button>
-                            
-                        </Group>
-                    </div>
-                )}
-                {auth.user.role === 3 && (
-                    <Button color="blue" onClick={sendJoinRequest}>Отправить заявку на участие</Button>
-                )}
-            </Group>
-            <Space h="md" />
-            <Divider my="md" color="black" />
-            <ScrollArea.Autosize maxHeight="calc(100vh - 200px)" style={{ flexGrow: 1 }}>
-                <div style={{ display: 'flex', flexGrow: 1 }}>
-                    {statuses.length > 0 && statuses.map((status, index) => (
-                        <TaskList
-                            key={status}
-                            title={status}
-                            tasks={tasks.filter((task) => task.status === status)}
-                            onTaskDragStart={onTaskDragStart}
-                            onTaskDragOver={onTaskDragOver}
-                            onTaskDrop={onTaskDrop}
-                            removeColumn={removeColumnByTitle}
-                            isEditMode={isEditMode}
-                            moveColumnLeft={moveColumnLeft}
-                            moveColumnRight={moveColumnRight}
-                            index={index}
-                            totalColumns={statuses.length}
-                            showOldTasks={showOldTasks}
-                            completedStatus={completedStatus}
-                            hiddenOldTasksCount={hiddenOldTasksCount}
-                        />
-                    ))}
-                </div>
-            </ScrollArea.Autosize>
-            <TaskCreateModal 
-                isOpen={isTaskCreateModalOpen} 
-                setIsOpen={(isOpen) => {
-                    setIsTaskCreateModalOpen(isOpen);
-                    if (!isOpen) refreshProjectDetails();
-                }} 
-                projectId={id} 
-                defaultStatus={statuses[0]} 
-            />
-            <ProjectChangeModal
-                isOpen={isProjectChangeModalOpen}
-                setIsOpen={(isOpen) => {
-                    setIsProjectChangeModalOpen(isOpen);
-                    if (!isOpen) refreshProjectDetails();
-                }}
-                projectId={id}
-                name={project.name}
-                description={project.description}
-                startDate={project.start_date}
-                endDate={project.end_date}
-                participants={participants}
-            />
-            <AddColumnModal
-                isOpen={isAddColumnModalOpen}
-                setIsOpen={(isOpen) => {
-                    setIsAddColumnModalOpen(isOpen);
-                    if (!isOpen) refreshProjectDetails();
-                }}
-                addColumn={addColumn}
-            />
-        </div>
-    );
+    const commonProps = {
+        id,
+        project,
+        tasks,
+        draggedTask,
+        isTaskCreateModalOpen,
+        setIsTaskCreateModalOpen,
+        isProjectChangeModalOpen,
+        setIsProjectChangeModalOpen,
+        isAddColumnModalOpen,
+        setIsAddColumnModalOpen,
+        isEditMode,
+        setIsEditMode,
+        participants,
+        statuses,
+        showOldTasks,
+        setShowOldTasks,
+        hiddenOldTasksCount,
+        setHiddenOldTasksCount,
+        completedStatus,
+        fetchUser,
+        fetchProject,
+        fetchTasks,
+        fetchParticipants,
+        refreshProjectDetails,
+        onTaskDragStart,
+        onTaskDragOver,
+        onTaskDrop,
+        deleteProject,
+        addColumn,
+        removeColumn,
+        removeColumnByTitle,
+        moveColumnLeft,
+        moveColumnRight,
+        saveColumnOrder,
+        sendJoinRequest
+    };
+
+     const isAssignedToProject = participants.some(p => p.id === auth.user.id);
+
+    if (auth.user.role !== 3) {
+        return <AdminProjectDetailsPage {...commonProps} />;
+    } else if (isAssignedToProject) {
+        return <AssignedUserProjectDetailsPage {...commonProps} />;
+    } else {
+        return <UserProjectDetailsPage {...commonProps} />;
+    }
 }
 
 export default ProjectDetailsPage;
