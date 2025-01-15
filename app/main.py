@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .config import Settings
 from .dependencies import engine, get_password_hash
 from . import database_models
-from .routes import users, projects, tasks, auth, roles, comments
+from .routes import users, projects, tasks, auth, roles, comments, requests
 
 
 def create_tables():
@@ -36,6 +36,7 @@ app.include_router(tasks.router)
 app.include_router(auth.router)
 app.include_router(roles.router)
 app.include_router(comments.router)
+app.include_router(requests.router, prefix="/requests")
 
 @click.group()
 @click.pass_context

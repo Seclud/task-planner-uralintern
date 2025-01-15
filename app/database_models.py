@@ -8,6 +8,7 @@ from sqlalchemy.dialects import postgresql as sa_psql
 utc_now = datetime.now(UTC)
 Base_decl = declarative_base()
 
+
 class Base(Base_decl):
     __abstract__ = True
 
@@ -21,7 +22,8 @@ class Base(Base_decl):
         onupdate=utc_now,
     )
 
-class Base_UUID (Base):
+
+class Base_UUID(Base):
     __abstract__ = True
 
     id: Mapped[uuid.UUID] = mapped_column(
@@ -30,17 +32,21 @@ class Base_UUID (Base):
         default=uuid.uuid4,
     )
 
+
 class Role(Base):
     __tablename__ = 'roles'
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True, nullable=False, comment='Название роли')
 
+
 class UserProjectLink(Base):
     __tablename__ = 'user_project_link'
 
     user_id: Mapped[uuid.UUID] = mapped_column(sa_psql.UUID(as_uuid=True), sa.ForeignKey('users.id'), primary_key=True)
-    project_id: Mapped[uuid.UUID] = mapped_column(sa_psql.UUID(as_uuid=True), sa.ForeignKey('projects.id'), primary_key=True)
+    project_id: Mapped[uuid.UUID] = mapped_column(sa_psql.UUID(as_uuid=True), sa.ForeignKey('projects.id'),
+                                                  primary_key=True)
+
 
 class User(Base_UUID):
     __tablename__ = 'users'
@@ -53,6 +59,7 @@ class User(Base_UUID):
     is_active: Mapped[bool] = mapped_column(sa.Boolean(), default=True, comment='Активен')
     projects: Mapped[list["Project"]] = relationship(secondary='user_project_link', back_populates='participants')
 
+
 class Project(Base_UUID):
     __tablename__ = 'projects'
 
@@ -62,59 +69,74 @@ class Project(Base_UUID):
     end_date: Mapped[datetime] = mapped_column(sa.Date, nullable=True, comment='Дата окончания')
     created_by: Mapped[uuid.UUID] = mapped_column(nullable=False, comment="Создатель проекта")
     participants: Mapped[list["User"]] = relationship(secondary='user_project_link', back_populates='projects')
-    statuses: Mapped[list[str]] = mapped_column(sa.ARRAY(sa.String), default=["Новые задачи", "В процессе", "Ревью", "Завершенные"], comment='Статусы задач')
+    statuses: Mapped[list[str]] = mapped_column(sa.ARRAY(sa.String),
+                                                default=["Новые задачи", "В процессе", "Ревью", "Завершенные"],
+                                                comment='Статусы задач')
+
 
 class Task(Base_UUID):
     __tablename__ = 'tasks'
 
     project_id: Mapped[uuid.UUID] = mapped_column(
-        sa_psql.UUID(as_uuid=True), 
-        sa.ForeignKey('projects.id', ondelete='CASCADE'), 
+        sa_psql.UUID(as_uuid=True),
+        sa.ForeignKey('projects.id', ondelete='CASCADE'),
         comment='Идентификатор проекта'
     )
     title: Mapped[str] = mapped_column(nullable=False, comment='Название задачи')
     description: Mapped[str] = mapped_column(nullable=True, comment='Описание задачи')
     status: Mapped[str] = mapped_column(comment='Статус задачи')
     due_date: Mapped[date] = mapped_column(sa.Date, nullable=True, comment='Срок выполнения')
-    created_by: Mapped[uuid.UUID] = mapped_column(sa_psql.UUID(as_uuid=True), sa.ForeignKey('users.id'), comment='Создано пользователем')
-    assigned_to: Mapped[uuid.UUID] = mapped_column(sa_psql.UUID(as_uuid=True), sa.ForeignKey('users.id'), comment='Назначено пользователю')
+    created_by: Mapped[uuid.UUID] = mapped_column(sa_psql.UUID(as_uuid=True), sa.ForeignKey('users.id'),
+                                                  comment='Создано пользователем')
+    assigned_to: Mapped[uuid.UUID] = mapped_column(sa_psql.UUID(as_uuid=True), sa.ForeignKey('users.id'),
+                                                   comment='Назначено пользователю')
+
 
 class File(Base_UUID):
     __tablename__ = 'files'
 
-    task_id: Mapped[uuid.UUID] = mapped_column(sa_psql.UUID(as_uuid=True), sa.ForeignKey('tasks.id'), comment='Идентификатор задачи')
+    task_id: Mapped[uuid.UUID] = mapped_column(sa_psql.UUID(as_uuid=True), sa.ForeignKey('tasks.id'),
+                                               comment='Идентификатор задачи')
     file_path: Mapped[str] = mapped_column(nullable=False, comment='Путь к файлу')
+
 
 class ActivityLog(Base_UUID):
     __tablename__ = 'activitylog'
 
-    user_id: Mapped[uuid.UUID] = mapped_column(sa_psql.UUID(as_uuid=True), sa.ForeignKey('users.id'), comment='Идентификатор пользователя')
+    user_id: Mapped[uuid.UUID] = mapped_column(sa_psql.UUID(as_uuid=True), sa.ForeignKey('users.id'),
+                                               comment='Идентификатор пользователя')
     action: Mapped[str] = mapped_column(nullable=False, comment='Действие')
+
 
 class Comment(Base_UUID):
     __tablename__ = 'comments'
 
-    task_id: Mapped[uuid.UUID] = mapped_column(sa_psql.UUID(as_uuid=True), sa.ForeignKey('tasks.id', ondelete='CASCADE'), comment='Идентификатор задачи')
-    user_id: Mapped[uuid.UUID] = mapped_column(sa_psql.UUID(as_uuid=True), sa.ForeignKey('users.id', ondelete='SET NULL'), comment='Идентификатор пользователя')
+    task_id: Mapped[uuid.UUID] = mapped_column(sa_psql.UUID(as_uuid=True),
+                                               sa.ForeignKey('tasks.id', ondelete='CASCADE'),
+                                               comment='Идентификатор задачи')
+    user_id: Mapped[uuid.UUID] = mapped_column(sa_psql.UUID(as_uuid=True),
+                                               sa.ForeignKey('users.id', ondelete='SET NULL'),
+                                               comment='Идентификатор пользователя')
     content: Mapped[str] = mapped_column(nullable=False, comment='Содержание')
     created_at: Mapped[datetime] = mapped_column(sa.DateTime(timezone=True), default=utc_now, comment='Дата создания')
+
 
 class Request(Base_UUID):
     __tablename__ = 'requests'
 
     user_id: Mapped[uuid.UUID] = mapped_column(
-        sa_psql.UUID(as_uuid=True), 
-        sa.ForeignKey('users.id'), 
-        nullable=False, 
+        sa_psql.UUID(as_uuid=True),
+        sa.ForeignKey('users.id'),
+        nullable=False,
         comment='Идентификатор пользователя'
     )
     project_id: Mapped[uuid.UUID] = mapped_column(
-        sa_psql.UUID(as_uuid=True), 
-        sa.ForeignKey('projects.id'), 
-        nullable=False, 
+        sa_psql.UUID(as_uuid=True),
+        sa.ForeignKey('projects.id'),
+        nullable=False,
         comment='Идентификатор проекта'
     )
     status: Mapped[str] = mapped_column(
-        nullable=False, 
+        nullable=False,
         comment='Статус запроса'
     )

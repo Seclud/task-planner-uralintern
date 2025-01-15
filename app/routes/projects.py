@@ -2,7 +2,7 @@ import uuid
 from fastapi import APIRouter, HTTPException, Depends
 from sqlmodel import Session
 from app.dependencies import get_db, get_current_user
-from app.pydantic_models import Project, ProjectCreate, User, ProjectUpdate
+from app.pydantic_models import Project, ProjectCreate, User, ProjectUpdate, RequestCreate
 from app import database_models
 
 router = APIRouter()
@@ -109,3 +109,27 @@ def get_project_participants(project_id: uuid.UUID, db: Session = Depends(get_db
     ).all()
 
     return participants
+
+@router.post("/projects/{project_id}/join-request")
+def join_project_request(project_id: uuid.UUID, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    db_project = db.query(database_models.Project).filter(database_models.Project.id == project_id).first()
+    if db_project is None:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    existing_request = db.query(database_models.Request).filter(
+        database_models.Request.project_id == project_id,
+        database_models.Request.user_id == current_user.id,
+        database_models.Request.status == 'pending'
+    ).first()
+
+    if existing_request:
+        raise HTTPException(status_code=400, detail="Вы уже отправили заявку на этот проект")
+
+    join_request = database_models.Request(
+        user_id=current_user.id,
+        project_id=project_id,
+        status= "pending"
+    )
+    db.add(join_request)
+    db.commit()
+    return {"message": "Join request sent"}
