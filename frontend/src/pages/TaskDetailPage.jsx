@@ -18,13 +18,21 @@ export default function TaskDetailPage() {
     const auth = useAuth();
     const navigate = useNavigate();
     const [participants, setParticipants] = useState([]);
+    const [statuses, setStatuses] = useState({});
 
-    const statusMap = {
-        'open': 'Новая задача',
-        'inprogress': 'В процессе',
-        'completed': 'Завершена',
-        'review': 'Ревью',
-        'overdue': 'Просрочена'
+    const fetchProjectStatuses = async (projectId) => {
+        const token = localStorage.getItem('authToken');
+        const response = await fetch(`${BACKEND_URL}/projects/${projectId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const data = await response.json();
+        const statusMap = data.statuses.reduce((map, status) => {
+            map[status.key] = status.name;
+            return map;
+        }, {});
+        setStatuses(statusMap);
     };
 
     const fetchTask = async () => {
@@ -39,6 +47,7 @@ export default function TaskDetailPage() {
         fetchUser(data.assigned_to, setAssignedTo);
         fetchUser(data.created_by, setCreatedBy);
         fetchProjectParticipants(data.project_id);
+        fetchProjectStatuses(data.project_id);
     };
 
     const fetchUser = async (userId, setUser) => {
@@ -132,7 +141,7 @@ export default function TaskDetailPage() {
                             Исполнитель: {assignedTo}
                         </Badge>
                         <Badge color="blue" variant="light">
-                            Статус: {statusMap[task.status] || task.status}
+                            Статус: {statuses[task.status] || task.status}
                         </Badge>
                         <Badge color="green" variant="light">
                             До: {task.due_date}
