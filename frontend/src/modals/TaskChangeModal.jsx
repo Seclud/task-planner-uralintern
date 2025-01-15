@@ -27,7 +27,7 @@ export default function TaskChangeModal(props) {
             .then(data => setUsers(data))
             .catch(error => console.error('Error fetching users:', error));
 
-        fetch(`${BACKEND_URL}/projects/${props.projectId}/`, {
+        fetch(`${BACKEND_URL}/projects/${props.projectId}`, {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -57,7 +57,7 @@ export default function TaskChangeModal(props) {
         };
 
         try {
-            const response = await fetch(`${BACKEND_URL}/tasks/${props.taskId}/`, {
+            const response = await fetch(`${BACKEND_URL}/tasks/${props.taskId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
