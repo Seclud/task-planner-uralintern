@@ -39,7 +39,7 @@ export default function AllTasksPage() {
 
     const fetchUser = async (userId) => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`${BACKEND_URL}/users/${userId}`, {
+        const response = await fetch(`${BACKEND_URL}/users/${userId}/`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -50,7 +50,7 @@ export default function AllTasksPage() {
 
     const fetchProject = async (projectId) => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`${BACKEND_URL}/projects/${projectId}`, {
+        const response = await fetch(`${BACKEND_URL}/projects/${projectId}/`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -61,7 +61,7 @@ export default function AllTasksPage() {
 
     const fetchUserRole = async () => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`${BACKEND_URL}/users_login/me`, {
+        const response = await fetch(`${BACKEND_URL}/users_login/me/`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

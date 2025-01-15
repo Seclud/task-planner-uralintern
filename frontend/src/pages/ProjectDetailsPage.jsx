@@ -81,7 +81,7 @@ function ProjectDetailsPage() {
 
     const fetchUser = async (userId) => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`${BACKEND_URL}/users/${userId}`, {
+        const response = await fetch(`${BACKEND_URL}/users/${userId}/`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -104,7 +104,7 @@ function ProjectDetailsPage() {
 
     const fetchTasks = async () => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`${BACKEND_URL}/projects/${id}/tasks`, {
+        const response = await fetch(`${BACKEND_URL}/projects/${id}/tasks/`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -120,7 +120,7 @@ function ProjectDetailsPage() {
 
     const fetchParticipants = async () => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`${BACKEND_URL}/projects/${id}/participants`, {
+        const response = await fetch(`${BACKEND_URL}/projects/${id}/participants/`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

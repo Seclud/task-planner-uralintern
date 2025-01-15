@@ -27,16 +27,16 @@ export default function App() {
                 <Notifications />
                 <Routes>
                     <Route element={<Layout />}>
-                        <Route path="/projects" element={<PrivateRoute><ProjectsPage /></PrivateRoute>} />
-                        <Route path="/projects/:id" element={<PrivateRoute><ProjectDetailsPage /></PrivateRoute>} />
-                        <Route path="/all-projects" element={<PrivateRoute><AllProjectsPage /></PrivateRoute>} />
-                        <Route path="/tasks" element={<PrivateRoute><AllTasksPage /></PrivateRoute>} />
-                        <Route path="/tasks/:id" element={<PrivateRoute><TaskDetailPage /></PrivateRoute>} />
-                        <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
+                        <Route path="/projects/" element={<PrivateRoute><ProjectsPage /></PrivateRoute>} />
+                        <Route path="/projects/:id/" element={<PrivateRoute><ProjectDetailsPage /></PrivateRoute>} />
+                        <Route path="/all-projects/" element={<PrivateRoute><AllProjectsPage /></PrivateRoute>} />
+                        <Route path="/tasks/" element={<PrivateRoute><AllTasksPage /></PrivateRoute>} />
+                        <Route path="/tasks/:id/" element={<PrivateRoute><TaskDetailPage /></PrivateRoute>} />
+                        <Route path="/profile/" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
                         <Route path="/" element={<HomePage />} />
-                        <Route path="/login" element={<LoginPage />} />
-                        <Route path="/registration" element={<RegistrationPage />} />
-                        <Route path="/admin/users" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
+                        <Route path="/login/" element={<LoginPage />} />
+                        <Route path="/registration/" element={<RegistrationPage />} />
+                        <Route path="/admin/users/" element={<AdminRoute><AdminUsersPage /></AdminRoute>} />
                     </Route>
                 </Routes>
             </MantineProvider>

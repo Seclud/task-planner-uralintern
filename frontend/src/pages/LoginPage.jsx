@@ -26,7 +26,7 @@ export default function LoginPage() {
             body.append('username', username);
             body.append('password', password);
 
-            const response = await fetch(`${BACKEND_URL}/login/access-token`, {
+            const response = await fetch(`${BACKEND_URL}/login/access-token/`, {
                 method: 'POST',
                 headers: headers,
                 body: body,

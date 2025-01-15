@@ -31,7 +31,7 @@ function RegistrationPage() {
 
 
         try {
-            const response = await fetch(`${BACKEND_URL}/users/signup`, {
+            const response = await fetch(`${BACKEND_URL}/users/signup/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
