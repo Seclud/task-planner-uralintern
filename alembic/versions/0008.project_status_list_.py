@@ -24,7 +24,7 @@ def upgrade() -> None:
     # ### end Alembic commands ###
     op.add_column('projects', sa.Column('statuses', sa.ARRAY(sa.String()), nullable=True, comment='Статусы задач'))
 
-    op.execute("UPDATE projects SET statuses = '{Новые задачи, В процессе, Ревью, Завершенные, Просроченные}' WHERE statuses IS NULL")
+    op.execute("UPDATE projects SET statuses = '{Новые задачи, В процессе, Ревью, Завершенные}' WHERE statuses IS NULL")
 
     op.alter_column('projects', 'statuses', nullable=False)
 
