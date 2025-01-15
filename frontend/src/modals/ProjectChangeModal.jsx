@@ -45,7 +45,7 @@ export default function ProjectChangeModal(props) {
         };
 
         try {
-            const response = await fetch(`${BACKEND_URL}/projects/${props.projectId}/`, {
+            const response = await fetch(`${BACKEND_URL}/projects/${props.projectId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
