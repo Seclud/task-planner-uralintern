@@ -95,7 +95,8 @@ function AdminRequestsPage() {
     }
 
     const filteredRequests = requests.filter(request =>
-        users[request.user_id]?.username.toLowerCase().includes(searchUsername.toLowerCase()) &&
+        (users[request.user_id]?.username.toLowerCase().includes(searchUsername.toLowerCase()) ||
+        users[request.user_id]?.email.toLowerCase().includes(searchUsername.toLowerCase())) &&
         (searchProjects.length === 0 || searchProjects.includes(projects[request.project_id]?.name))
     );
 
@@ -103,7 +104,7 @@ function AdminRequestsPage() {
         <Container size="100rem">
             <Text weight={500} size="xl" mb="md">Заявки на рассмотрении</Text>
             <TextInput
-                placeholder="Поиск по имени"
+                placeholder="Поиск по имени или почте"
                 value={searchUsername}
                 onChange={(e) => setSearchUsername(e.currentTarget.value)}
                 style={{ marginBottom: 20 }}
