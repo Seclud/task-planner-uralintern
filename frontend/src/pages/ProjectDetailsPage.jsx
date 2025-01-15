@@ -77,7 +77,7 @@ function ProjectDetailsPage() {
     const [hiddenOldTasksCount, setHiddenOldTasksCount] = useState(0);
     const auth = useAuth();
 
-    const completedStatus = statuses[statuses.length - 1]?.key;
+    const completedStatus = statuses[statuses.length - 1];
 
     const fetchUser = async (userId) => {
         const token = localStorage.getItem('authToken');
@@ -91,14 +91,15 @@ function ProjectDetailsPage() {
 
     const fetchProject = async () => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`${BACKEND_URL}/projects/${id}`, {
+        const response = await fetch(
+            `${BACKEND_URL}/projects/${id}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
-        });
-        const data = await response.json();
-        setProject(data);
-        setStatuses(data.statuses || []);
+        }
+        ).then((response) => response.json());
+        setProject(response);
+        setStatuses(response.statuses || []);
     };
 
     const fetchTasks = async () => {
@@ -178,11 +179,11 @@ function ProjectDetailsPage() {
     };
 
     const onTaskDrop = async (e, targetTitle) => {
-        const targetCol = statuses.find(status => status.name === targetTitle);
+        const targetCol = statuses.find(status => status === targetTitle);
         if (targetCol) {
             const updatedTasks = tasks.map((task) => {
                 if (task.id === draggedTask.id) {
-                    task.status = targetCol.key;
+                    task.status = targetCol;
                 }
                 return task;
             });
@@ -190,7 +191,7 @@ function ProjectDetailsPage() {
 
             const updatedTask = {
                 ...draggedTask,
-                status: targetCol.key,
+                status: targetCol,
                 assigned_to: draggedTask.assigned_to.id,
                 created_by: draggedTask.created_by.id
             };
@@ -216,7 +217,7 @@ function ProjectDetailsPage() {
     };
 
     const addColumn = async (statusKey) => {
-        const updatedStatuses = [...statuses, { key: statusKey, name: statusKey }];
+        const updatedStatuses = [...statuses, statusKey];
         setStatuses(updatedStatuses);
         await fetch(`${BACKEND_URL}/projects/${id}/`, {
             method: 'PUT',
@@ -233,7 +234,7 @@ function ProjectDetailsPage() {
     };
 
     const removeColumn = async (statusKey) => {
-        const updatedStatuses = statuses.filter((status) => status.key !== statusKey);
+        const updatedStatuses = statuses.filter((status) => status !== statusKey);
         setStatuses(updatedStatuses);
         await fetch(`${BACKEND_URL}/projects/${id}/`, {
             method: 'PUT',
@@ -250,9 +251,9 @@ function ProjectDetailsPage() {
     };
 
     const removeColumnByTitle = (title) => {
-        const column = statuses.find(status => status.name === title);
+        const column = statuses.find(status => status === title);
         if (column) {
-            removeColumn(column.key);
+            removeColumn(column);
         }
     };
 
@@ -345,9 +346,9 @@ function ProjectDetailsPage() {
                 <div style={{ display: 'flex', flexGrow: 1 }}>
                     {statuses.length > 0 && statuses.map((status, index) => (
                         <TaskList
-                            key={status.key}
-                            title={status.name}
-                            tasks={tasks.filter((task) => task.status === status.key)}
+                            key={status}
+                            title={status}
+                            tasks={tasks.filter((task) => task.status === status)}
                             onTaskDragStart={onTaskDragStart}
                             onTaskDragOver={onTaskDragOver}
                             onTaskDrop={onTaskDrop}
