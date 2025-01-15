@@ -48,7 +48,7 @@ export default function TaskCreateModal({ isOpen, setIsOpen, projectId, defaultS
         };
 
         try {
-            const response = await fetch(`${BACKEND_URL}/tasks`, {
+            const response = await fetch(`${BACKEND_URL}/tasks/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

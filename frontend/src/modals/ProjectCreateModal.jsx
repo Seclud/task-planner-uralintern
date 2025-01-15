@@ -18,7 +18,7 @@ export default function ProjectCreateModal(props) {
     const [users, setUsers] = useState([]);
 
     useEffect(() => {
-        fetch(`${BACKEND_URL}/users`, {
+        fetch(`${BACKEND_URL}/users/`, {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -48,7 +48,7 @@ export default function ProjectCreateModal(props) {
         };
 
         try {
-            const response = await fetch(`${BACKEND_URL}/projects`, {
+            const response = await fetch(`${BACKEND_URL}/projects/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
