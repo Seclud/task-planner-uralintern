@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Table, Button, Group, Text, Container, TextInput, Popover, MultiSelect } from '@mantine/core';
 import { BACKEND_URL } from '../main.jsx';
 import { useAuth } from "../contexts/AuthContext.jsx";
+import { showNotification } from '@mantine/notifications';
 
 function AdminRequestsPage() {
     const [requests, setRequests] = useState([]);
@@ -72,6 +73,11 @@ function AdminRequestsPage() {
                 'Authorization': `Bearer ${token}`
             }
         });
+        showNotification({
+            title: 'Заявка принята',
+            message: 'Заявка успешно принята',
+            color: 'green'
+        });
         fetchRequests();
     };
 
@@ -82,6 +88,11 @@ function AdminRequestsPage() {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
+        });
+        showNotification({
+            title: 'Заявка отклонена',
+            message: 'Заявка успешно отклонена',
+            color: 'green'
         });
         fetchRequests();
     };
