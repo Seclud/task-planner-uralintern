@@ -2,6 +2,7 @@ import { Button, Space, Text, TextInput, Title, Modal, Stack, Select } from "@ma
 import { DatePickerInput } from "@mantine/dates";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { BACKEND_URL } from '../main.jsx';
 
 export default function TaskChangeModal(props) {
     const navigate = useNavigate();
