@@ -16,7 +16,7 @@ export default function TaskChangeModal(props) {
     const [statuses, setStatuses] = useState([]);
 
     useEffect(() => {
-        fetch(`${BACKEND_URL}/projects/${props.projectId}/participants/`, {
+        fetch(`${BACKEND_URL}/projects/${props.projectId}/participants`, {
             method: 'GET',
             credentials: 'include',
             headers: {

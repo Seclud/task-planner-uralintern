@@ -29,7 +29,7 @@ export default function TaskDetailPage() {
 
     const fetchTask = async () => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`${BACKEND_URL}/tasks/${id}/`, {
+        const response = await fetch(`${BACKEND_URL}/tasks/${id}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -43,7 +43,7 @@ export default function TaskDetailPage() {
 
     const fetchUser = async (userId, setUser) => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`${BACKEND_URL}/users/${userId}/`, {
+        const response = await fetch(`${BACKEND_URL}/users/${userId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -72,7 +72,7 @@ export default function TaskDetailPage() {
     };
 
     const fetchComments = async () => {
-        const response = await fetch(`${BACKEND_URL}/comments/tasks/${id}/`);
+        const response = await fetch(`${BACKEND_URL}/comments/tasks/${id}`);
         const data = await response.json();
         const commentsWithUsernames = await Promise.all(data.map(async (comment) => {
             const userResponse = await fetch(`${BACKEND_URL}/users/${comment.user_id}`);
@@ -84,7 +84,7 @@ export default function TaskDetailPage() {
 
     const handleAddComment = async () => {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`${BACKEND_URL}/comments/`, {
+        const response = await fetch(`${BACKEND_URL}/comments`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

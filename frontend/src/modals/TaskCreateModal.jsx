@@ -17,7 +17,7 @@ export default function TaskCreateModal({ isOpen, setIsOpen, projectId, defaultS
     const [users, setUsers] = useState([]);
 
     useEffect(() => {
-        fetch(`${BACKEND_URL}/projects/${projectId}/participants/`, {
+        fetch(`${BACKEND_URL}/projects/${projectId}/participants`, {
             method: 'GET',
             credentials: 'include',
             headers: {

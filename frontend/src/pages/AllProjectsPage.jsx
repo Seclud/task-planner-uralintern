@@ -11,7 +11,7 @@ function AllProjectsPage() {
     const getApiData = async () => {
         const token = localStorage.getItem('authToken');
         const response = await fetch(
-            `${BACKEND_URL}/projects/all/`, { // Updated endpoint
+            `${BACKEND_URL}/projects/all`, { // Updated endpoint
             headers: {
                 'Authorization': `Bearer ${token}`
             }

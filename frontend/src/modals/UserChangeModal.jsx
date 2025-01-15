@@ -26,7 +26,7 @@ export default function UserChangeModal(props) {
         const user = {username, email, phone};
 
         try {
-            const response = await fetch(`${BACKEND_URL}/users/${id}/`, {
+            const response = await fetch(`${BACKEND_URL}/users/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
