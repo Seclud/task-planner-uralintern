@@ -36,13 +36,13 @@ export default function ProfilePage() {
                             <Text size="md">Телефон: {user.phone}</Text>
                             <Space h="md" />
 
-                            <Button color="yellow" radius="md"  onClick={() => {
+                            <Button color="#5C74B7" radius="md"  onClick={() => {
                                 handleUserUpdate(user)
                             }}>
                                 Изменить
                             </Button>
 
-                            <Button radius="md" onClick={handleLogout}>
+                            <Button color="#f87666" radius="md" onClick={handleLogout}>
                                 Выйти
                             </Button>
                         </>

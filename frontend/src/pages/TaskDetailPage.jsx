@@ -140,25 +140,25 @@ export default function TaskDetailPage() {
             <Card padding="lg" radius="md" withBorder style={{ marginBottom: '20px' }}>
                 <Group position="apart" justify="space-between">
                     <div>
-                        <Text weight={500} size="xl">{task.title}</Text>
-                        <Text size="sm" color="dimmed">{task.description} </Text>
-                        <Badge color="pink" variant="light">
+                        <Text weight={500} size="xl" style={{ paddingBottom: '10px' }}>{task.title}</Text>
+                        <Text color="dimmed" style={{ paddingBottom: '10px' }}>{task.description} </Text>
+                        <Badge size="lg" color="#5C74B7" variant="light" style={{ paddingBottom: '10px' }}>
                             Автор: {createdBy}
                         </Badge>
-                        <Badge color="pink" variant="light">
+                        <Badge size="lg" color="#5C74B7" variant="light" style={{ paddingBottom: '10px' }}>
                             Исполнитель: {assignedTo}
                         </Badge>
-                        <Badge color="blue" variant="light">
+                        <Badge size="lg" color="#5C74B7" variant="light" style={{ paddingBottom: '10px' }}>
                             Статус: {statuses[task.status] || task.status}
                         </Badge>
-                        <Badge color="green" variant="light">
+                        <Badge size="lg" color="#5C74B7" variant="light" style={{ paddingBottom: '10px' }}>
                             До: {task.due_date}
                         </Badge>
                     </div>
                     {isUserAssigned && (
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                            <Button color="yellow" onClick={() => setIsModalOpen(true)} style={{ marginBottom: 10 }}>Изменить</Button>
-                            <Button color="red" onClick={deleteTask}>Удалить</Button>
+                            <Button color="#5C74B7" onClick={() => setIsModalOpen(true)} style={{ marginBottom: 10 }}>Изменить</Button>
+                            <Button color="#f87666" onClick={deleteTask}>Удалить</Button>
                         </div>
                     )}
                 </Group>
@@ -166,7 +166,7 @@ export default function TaskDetailPage() {
             <Card shadow="sm" padding="lg" radius="md" withBorder>
                 <Text weight={500} size="xl">Комментарии</Text>
                 {comments.map(comment => (
-                    <Text key={comment.id} size="sm" color="dimmed">
+                    <Text key={comment.id} size="sm">
                         {comment.username}: {comment.content}
                     </Text>
                 ))}
@@ -179,7 +179,7 @@ export default function TaskDetailPage() {
                         onChange={(event) => setNewComment(event.currentTarget.value)}
                         style={{ flexGrow: 1 }}
                     />
-                    <Button onClick={handleAddComment} disabled={!newComment}>Добавить комментарий</Button>
+                    <Button color = "#5C74B7" onClick={handleAddComment} disabled={!newComment}>Добавить комментарий</Button>
                 </Group>
             </Card>
             <TaskChangeModal

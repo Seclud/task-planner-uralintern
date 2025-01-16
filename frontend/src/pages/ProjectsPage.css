@@ -1,0 +1,28 @@
+.no-projects-text {
+    margin-left: 10px;
+    color: #22223B; /* space cadet */
+
+    @mixin smaller-than 768px {
+        font-size: 14px;
+    }
+}
+
+.project-button {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    background-color: #f2e9e4; /* isabelline */
+    border: 1px solid #C9ADA7; /* pale dogwood */
+
+    @mixin smaller-than 768px {
+        height: auto;
+    }
+}
+
+.project-button .mantine-Text-root {
+    word-break: break-word;
+    white-space: normal;
+    overflow-wrap: break-word;
+    color: #4A4E69; /* ultra violet */
+}

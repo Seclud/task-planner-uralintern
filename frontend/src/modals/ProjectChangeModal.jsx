@@ -113,7 +113,7 @@ export default function ProjectChangeModal(props) {
                     </>
                 }
 
-                <Button onClick={handleSubmit} disabled={!name || !description || !startDate || !endDate || participants.length === 0}>
+                <Button color="#5C74B7" onClick={handleSubmit} disabled={!name || !description || !startDate || !endDate || participants.length === 0}>
                     Изменить
                 </Button>
             </Stack>

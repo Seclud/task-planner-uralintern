@@ -6,7 +6,9 @@
     margin: auto;
 }
 
-.logo {
-    height: 48px;
-    width: auto;
+.navLinks {
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    margin: auto;
 }

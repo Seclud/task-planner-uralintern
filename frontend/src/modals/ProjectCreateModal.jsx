@@ -116,7 +116,7 @@ export default function ProjectCreateModal(props) {
                     </>
                 }
 
-                <Button onClick={handleSubmit} disabled={!name || !description}>
+                <Button color="#5C74B7" onClick={handleSubmit} disabled={!name || !description}>
                     Создать
                 </Button>
             </Stack>

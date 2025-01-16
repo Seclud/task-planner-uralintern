@@ -19,7 +19,7 @@ function AddColumnModal({ isOpen, setIsOpen, addColumn }) {
                 onChange={(e) => setStatus(e.currentTarget.value)}
                 required
             />
-            <Button onClick={handleAddColumn} style={{ marginTop: 10 }}>
+            <Button color="#5C74B7" onClick={handleAddColumn} style={{ marginTop: 10 }}>
                 Добавить статус
             </Button>
         </Modal>

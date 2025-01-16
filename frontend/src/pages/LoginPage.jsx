@@ -75,7 +75,7 @@ export default function LoginPage() {
                     </>
                 )}
 
-                <Button fullWidth mt="xl" size="md" onClick={(event) => handleSubmit(event)}>
+                <Button color="#5C74B7" fullWidth mt="xl" size="md" onClick={(event) => handleSubmit(event)}>
                     Войти
                 </Button>
 
@@ -85,7 +85,7 @@ export default function LoginPage() {
                         Нет аккаунта?
                     </Text>
                     <Link to="/registration">
-                        <Button variant="transparent" size="md">Зарегистрироваться</Button>
+                        <Button color="#5C74B7" variant="transparent" size="md">Зарегистрироваться</Button>
                     </Link>
                 </Group>
             </Paper>

@@ -111,7 +111,7 @@ function RegistrationPage() {
                         <Text ta="center" c="red">{errorMessage}</Text>
                     </>
                 }
-                <Button fullWidth mt="xl" size="md" onClick={(event) => handleSubmit(event)}>
+                <Button color="#5C74B7" fullWidth mt="xl" size="md" onClick={(event) => handleSubmit(event)}>
                     Зарегистрироваться
                 </Button>
 
@@ -121,7 +121,7 @@ function RegistrationPage() {
                         Уже есть аккаунт?
                     </Text>
                     <Link to="/login">
-                        <Button variant="transparent" size="md">Войти</Button>
+                        <Button color="#5C74B7" variant="transparent" size="md">Войти</Button>
                     </Link>
                 </Group>
             </Paper>

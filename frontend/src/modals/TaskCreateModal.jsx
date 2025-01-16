@@ -110,7 +110,7 @@ export default function TaskCreateModal({ isOpen, setIsOpen, projectId, defaultS
                     </>
                 }
 
-                <Button onClick={handleSubmit} disabled={!title || !description}>
+                <Button color="#5C74B7" onClick={handleSubmit} disabled={!title || !description}>
                     Создать
                 </Button>
             </Stack>

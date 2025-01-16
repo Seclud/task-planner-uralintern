@@ -21,19 +21,19 @@ function TaskList({ title, tasks, onTaskDragStart, onTaskDragOver, onTaskDrop, r
             onDrop={isDraggable ? (e) => onTaskDrop(e, title) : null}
             style={{ minWidth: 300, flexGrow: 1 }}
         >
-            <h1>{title}</h1>
+            <Text size="xl" fw={700} color = "#353535">{title}</Text>
             {title === completedStatus && !showOldTasks && (
                 <Text size="sm" color="dimmed">Скрыто задач: {hiddenOldTasksCount}</Text>
             )}
             {isEditMode && (
                 <Group position="center" style={{ marginBottom: 10 }}>
-                    <Button color="blue" size="xs" onClick={() => moveColumnLeft(index)} disabled={index === 0}>
+                    <Button color="#5C74B7" size="xs" onClick={() => moveColumnLeft(index)} disabled={index === 0}>
                         ←
                     </Button>
-                    <Button color="blue" size="xs" onClick={() => moveColumnRight(index)} disabled={index === totalColumns - 1}>
+                    <Button color="#5C74B7" size="xs" onClick={() => moveColumnRight(index)} disabled={index === totalColumns - 1}>
                         →
                     </Button>
-                    <Button color="red" size="xs" onClick={() => removeColumn(title)}>
+                    <Button color="#f87666" size="xs" onClick={() => removeColumn(title)}>
                         Удалить
                     </Button>
                 </Group>
@@ -50,7 +50,7 @@ function TaskList({ title, tasks, onTaskDragStart, onTaskDragOver, onTaskDrop, r
                         style={{ wordWrap: 'break-word', maxWidth: 300, cursor: isDraggable ? 'pointer' : 'default' }}
                     >
                         <Text weight={500} style={{ wordWrap: 'break-word', padding: '5px' }}>{task.title}</Text>
-                        <Badge color={new Date(task.due_date) < new Date() ? "red" : "green"} variant="light" style={{ padding: '5px' }}>
+                        <Badge color={new Date(task.due_date) < new Date() ? "#F87666" : "#4F9D69"} variant="light" style={{ padding: '5px' }}>
                             До: {task.due_date}
                         </Badge>
                         <Text size="sm" color="blue" style={{ wordWrap: 'break-word', padding: '5px' }}>Автор: {task.created_by.username}</Text>
@@ -63,33 +63,38 @@ function TaskList({ title, tasks, onTaskDragStart, onTaskDragOver, onTaskDrop, r
 }
 
 function AdminProjectDetailsPage(props) {
+    const formatDate = (dateString) => {
+        const options = { day: '2-digit', month: 'long', year: 'numeric' };
+        return new Date(dateString).toLocaleDateString('ru-RU', options);
+    };
+
     return (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
             <Group position="apart" justify="space-between">
                 <div>
-                    <Text weight={500}>{props.project.name}</Text>
+                    <Text size="xl" fw={500} color = "#353535">{props.project.name}</Text>
                     <Space h="9px" />
-                    <Text size="sm" color="dimmed" >{props.project.description}</Text>
+                    <Text  color = "#353535" >{props.project.description}</Text>
                     <Group position="apart" style={{ marginTop: 15 }}>
-                        <Badge color="blue" variant="light">
-                            Начался: {props.project.start_date}
-                        </Badge>
-                        <Badge color="pink" variant="light">
-                            Закончится: {props.project.end_date}
-                        </Badge>
+                        <div style={{ border: '1px solid black', padding: '5px', borderRadius: '5px' }}>
+                            <Text color="black">Дата начала: {formatDate(props.project.start_date)}</Text>
+                        </div>
+                        <div style={{ border: '1px solid black', padding: '5px', borderRadius: '5px' }}>
+                            <Text color="black">Дата конца: {formatDate(props.project.end_date)}</Text>
+                        </div>
                     </Group>
-                    <Text size="sm" color="dimmed">Участники: {props.participants.map(p => p.username).join(', ')}</Text>
+                    <Text  color = "#353535">Участники: {props.participants.map(p => p.username).join(', ')}</Text>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                     <Group spacing="xs">
-                        <Button color="green" onClick={() => props.setIsTaskCreateModalOpen(true)}>Добавить задачу</Button>
-                        <Button color="yellow" onClick={() => props.setIsProjectChangeModalOpen(true)}>Изменить проект</Button>
-                        <Button color="red" onClick={props.deleteProject}>Удалить проект</Button>
+                        <Button color="#4F9D69" onClick={() => props.setIsTaskCreateModalOpen(true)}>Добавить задачу</Button>
+                        <Button color="#5C74B7" onClick={() => props.setIsProjectChangeModalOpen(true)}>Изменить проект</Button>
+                        <Button color="#F87666" onClick={props.deleteProject}>Удалить проект</Button>
                     </Group>
                     <Space h="md" />
                     <Group spacing="xs">
-                        <Button onClick={() => props.setIsAddColumnModalOpen(true)}>Добавить статус задач</Button>
-                        <Button
+                        <Button color="#5C74B7" onClick={() => props.setIsAddColumnModalOpen(true)}>Добавить статус задач</Button>
+                        <Button color="#5C74B7"
                             onClick={() => {
                                 if (props.isEditMode) {
                                     props.saveColumnOrder();
@@ -100,7 +105,7 @@ function AdminProjectDetailsPage(props) {
                         >
                             {props.isEditMode ? 'Сохранить' : 'Изменить статусы задач'}
                         </Button>
-                        <Button onClick={() => props.setShowOldTasks(!props.showOldTasks)}>
+                        <Button color="#5C74B7" onClick={() => props.setShowOldTasks(!props.showOldTasks)}>
                             {props.showOldTasks ? 'Скрыть старые завершенные задачи' : 'Показать старые завершенные задачи'}
                         </Button>
                     </Group>
@@ -132,14 +137,14 @@ function AdminProjectDetailsPage(props) {
                     ))}
                 </div>
             </ScrollArea.Autosize>
-            <TaskCreateModal 
-                isOpen={props.isTaskCreateModalOpen} 
+            <TaskCreateModal
+                isOpen={props.isTaskCreateModalOpen}
                 setIsOpen={(isOpen) => {
                     props.setIsTaskCreateModalOpen(isOpen);
                     if (!isOpen) props.refreshProjectDetails();
-                }} 
-                projectId={props.id} 
-                defaultStatus={props.statuses[0]} 
+                }}
+                projectId={props.id}
+                defaultStatus={props.statuses[0]}
             />
             <ProjectChangeModal
                 isOpen={props.isProjectChangeModalOpen}
@@ -167,22 +172,27 @@ function AdminProjectDetailsPage(props) {
 }
 
 function UserProjectDetailsPage(props) {
+    const formatDate = (dateString) => {
+        const options = { day: '2-digit', month: 'long', year: 'numeric' };
+        return new Date(dateString).toLocaleDateString('ru-RU', options);
+    };
+
     return (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
             <Group position="apart" justify="space-between">
                 <div>
-                    <Text weight={500}>{props.project.name}</Text>
+                    <Text size="xl" fw={500} color = "#353535">{props.project.name}</Text>
                     <Space h="9px" />
-                    <Text size="sm" color="dimmed" >{props.project.description}</Text>
+                    <Text color = "#353535" >{props.project.description}</Text>
                     <Group position="apart" style={{ marginTop: 15 }}>
-                        <Badge color="blue" variant="light">
-                            Начался: {props.project.start_date}
-                        </Badge>
-                        <Badge color="pink" variant="light">
-                            Закончится: {props.project.end_date}
-                        </Badge>
+                        <div style={{ border: '1px solid black', padding: '5px', borderRadius: '5px' }}>
+                            <Text color="black">Дата начала: {formatDate(props.project.start_date)}</Text>
+                        </div>
+                        <div style={{ border: '1px solid black', padding: '5px', borderRadius: '5px' }}>
+                            <Text color="black">Дата конца: {formatDate(props.project.end_date)}</Text>
+                        </div>
                     </Group>
-                    <Text size="sm" color="dimmed">Участники: {props.participants.map(p => p.username).join(', ')}</Text>
+                    <Text color = "#353535">Участники: {props.participants.map(p => p.username).join(', ')}</Text>
                 </div>
                 <Button color="blue" onClick={props.sendJoinRequest}>Отправить заявку на участие</Button>
             </Group>
@@ -217,26 +227,31 @@ function UserProjectDetailsPage(props) {
 }
 
 function AssignedUserProjectDetailsPage(props) {
+    const formatDate = (dateString) => {
+        const options = { day: '2-digit', month: 'long', year: 'numeric' };
+        return new Date(dateString).toLocaleDateString('ru-RU', options);
+    };
+
     return (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
             <Group position="apart" justify="space-between">
                 <div>
-                    <Text weight={500}>{props.project.name}</Text>
+                    <Text size="xl" fw={500} color = "#353535">{props.project.name}</Text>
                     <Space h="9px" />
-                    <Text size="sm" color="dimmed" >{props.project.description}</Text>
+                    <Text color = "#353535" >{props.project.description}</Text>
                     <Group position="apart" style={{ marginTop: 15 }}>
-                        <Badge color="blue" variant="light">
-                            Начался: {props.project.start_date}
-                        </Badge>
-                        <Badge color="pink" variant="light">
-                            Закончится: {props.project.end_date}
-                        </Badge>
+                        <div style={{ border: '1px solid black', padding: '5px', borderRadius: '5px' }}>
+                            <Text color="black">Дата начала: {formatDate(props.project.start_date)}</Text>
+                        </div>
+                        <div style={{ border: '1px solid black', padding: '5px', borderRadius: '5px' }}>
+                            <Text color="black">Дата конца: {formatDate(props.project.end_date)}</Text>
+                        </div>
                     </Group>
-                    <Text size="sm" color="dimmed">Участники: {props.participants.map(p => p.username).join(', ')}</Text>
+                    <Text color = "#353535">Участники: {props.participants.map(p => p.username).join(', ')}</Text>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                     <Group spacing="xs">
-                        <Button color="green" onClick={() => props.setIsTaskCreateModalOpen(true)}>Добавить задачу</Button>
+                        <Button color="#4F9D69" onClick={() => props.setIsTaskCreateModalOpen(true)}>Добавить задачу</Button>
                     </Group>
                 </div>
             </Group>
@@ -266,14 +281,14 @@ function AssignedUserProjectDetailsPage(props) {
                     ))}
                 </div>
             </ScrollArea.Autosize>
-            <TaskCreateModal 
-                isOpen={props.isTaskCreateModalOpen} 
+            <TaskCreateModal
+                isOpen={props.isTaskCreateModalOpen}
                 setIsOpen={(isOpen) => {
                     props.setIsTaskCreateModalOpen(isOpen);
                     if (!isOpen) props.refreshProjectDetails();
-                }} 
-                projectId={props.id} 
-                defaultStatus={props.statuses[0]} 
+                }}
+                projectId={props.id}
+                defaultStatus={props.statuses[0]}
             />
         </div>
     );
@@ -405,10 +420,12 @@ function ProjectDetailsPage() {
                 created_by: draggedTask.created_by.id
             };
 
+            const token = localStorage.getItem('authToken');
             await fetch(`${BACKEND_URL}/tasks/${draggedTask.id}/`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify(updatedTask),
             });
@@ -546,7 +563,7 @@ function ProjectDetailsPage() {
         sendJoinRequest
     };
 
-     const isAssignedToProject = participants.some(p => p.id === auth.user.id);
+    const isAssignedToProject = participants.some(p => p.id === auth.user.id);
 
     if (auth.user.role !== 3) {
         return <AdminProjectDetailsPage {...commonProps} />;

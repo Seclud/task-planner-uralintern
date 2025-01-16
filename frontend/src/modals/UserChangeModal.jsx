@@ -83,7 +83,7 @@ export default function UserChangeModal(props) {
                     </>
                 }
 
-                <Button onClick={handleSubmit} disabled={!username || !email || !phone}>
+                <Button color="#5C74B7" onClick={handleSubmit} disabled={!username || !email || !phone}>
                     Изменить
                 </Button>
             </Stack>

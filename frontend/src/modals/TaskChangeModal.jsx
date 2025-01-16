@@ -126,7 +126,7 @@ export default function TaskChangeModal(props) {
                     </>
                 }
 
-                <Button onClick={handleSubmit} disabled={!title || !description || !dueDate || !status || !assignedTo}>
+                <Button color="#5C74B7" onClick={handleSubmit} disabled={!title || !description || !dueDate || !status || !assignedTo}>
                     Изменить
                 </Button>
             </Stack>

@@ -1,0 +1,21 @@
+.table-container {
+    overflow-x: auto;
+
+    @mixin smaller-than 768px {
+        width: 100%;
+    }
+}
+
+.table-container table {
+    min-width: 600px;
+}
+
+.table-container th,
+.table-container td {
+    white-space: nowrap;
+    padding: 8px 16px;
+}
+
+.table-container th {
+    text-align: left;
+}

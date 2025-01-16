@@ -172,8 +172,8 @@ function AdminRequestsPage() {
                                 <Table.Td>{projects[request.project_id]?.name || 'Загрузка...'}</Table.Td>
                                 <Table.Td>
                                     <Group spacing="xs">
-                                        <Button color="green" onClick={() => handleApprove(request.id)}>Принять</Button>
-                                        <Button color="red" onClick={() => handleReject(request.id)}>Отклонить</Button>
+                                        <Button color="#4F9D69" onClick={() => handleApprove(request.id)}>Принять</Button>
+                                        <Button color="#f87666" onClick={() => handleReject(request.id)}>Отклонить</Button>
                                     </Group>
                                 </Table.Td>
                             </Table.Tr>
