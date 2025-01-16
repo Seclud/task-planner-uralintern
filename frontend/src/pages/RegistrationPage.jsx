@@ -45,7 +45,7 @@ function RegistrationPage() {
             }
             setErrorMessage('');
 
-            notifications.show({ message: 'Аккаунт зарегистрирован', color: 'green' });
+            notifications.show({ message: 'Вам на почту было отправлено письмо для потверждения', color: 'green' });
             navigate('/login');
         } catch (error) {
             console.error('Registration error:', error);

@@ -12,9 +12,13 @@ import ProfilePage from './pages/ProfilePage.jsx';
 import AdminUsersPage from './pages/AdminUsersPage.jsx';
 import AllProjectsPage from './pages/AllProjectsPage.jsx';
 import AdminRequestsPage from './pages/AdminRequestsPage.jsx';
+import EmailConfirmationPage from "./pages/EmailConfirmationPage.jsx";
 import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
 import { Notifications } from "@mantine/notifications";
 import AdminRoute from './components/AdminRoute';
+import 'dayjs/locale/ru';
+import { DatesProvider } from '@mantine/dates';
+
 
 const PrivateRoute = ({ children }) => {
     const auth = useAuth();
@@ -25,6 +29,7 @@ export default function App() {
     return (
         <AuthProvider>
             <MantineProvider>
+                <DatesProvider settings={{ locale: 'ru' }}>
                 <Notifications />
                 <Routes>
                     <Route element={<Layout />}>
@@ -34,6 +39,7 @@ export default function App() {
                         <Route path="/tasks" element={<PrivateRoute><AllTasksPage /></PrivateRoute>} />
                         <Route path="/tasks/:id" element={<PrivateRoute><TaskDetailPage /></PrivateRoute>} />
                         <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
+                        <Route path="/email-confirmation/:confirmationToken" element={<EmailConfirmationPage />} />
                         <Route path="/" element={<HomePage />} />
                         <Route path="/login" element={<LoginPage />} />
                         <Route path="/registration" element={<RegistrationPage />} />
@@ -41,6 +47,7 @@ export default function App() {
                         <Route path="/admin/requests" element={<AdminRoute><AdminRequestsPage /></AdminRoute>} />
                     </Route>
                 </Routes>
+                </DatesProvider>
             </MantineProvider>
         </AuthProvider>
     );

@@ -1,14 +1,30 @@
 import uuid
 from fastapi import APIRouter, HTTPException, Depends
 from sqlmodel import Session
+
+from app.mails import send_email
+from app.config import Settings
 from app.dependencies import get_db, get_password_hash, get_current_user
 from app.pydantic_models import User, UserReg, UserUpdate
 from app import database_models
 
 router = APIRouter()
 
+
+@router.get("/users/confirm/{user_id}")
+def confirm_email(user_id: str, session: Session = Depends(get_db)):
+
+    user = session.get(database_models.User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    user.is_active = True
+    session.commit()
+
+    return {"message": "Email confirmed successfully"}
+
 @router.post("/users/", response_model=User)
-def create_user(user: UserReg, db: Session = Depends(get_db)):
+def create_user(user: UserReg, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     db_user = database_models.User(
         username=user.username,
         email=user.email,
@@ -32,21 +48,21 @@ def create_user(user: UserReg, db: Session = Depends(get_db)):
     return db_user
 
 @router.get("/users/{user_id}", response_model=User)
-def read_user(user_id: uuid.UUID, db: Session = Depends(get_db)):
+def read_user(user_id: uuid.UUID, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     db_user = db.query(database_models.User).filter(database_models.User.id == user_id).first()
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 
 @router.get("/users/", response_model=list[User])
-def read_users(db: Session = Depends(get_db)):
+def read_users(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     db_users = db.query(database_models.User).all()
     if db_users is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_users
 
 @router.put("/users/{user_id}", response_model=User)
-def update_user(user_id: uuid.UUID, updated_user: UserUpdate, db: Session = Depends(get_db)):
+def update_user(user_id: uuid.UUID, updated_user: UserUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     db_user = db.query(database_models.User).filter(database_models.User.id == user_id).first()
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
@@ -59,7 +75,7 @@ def update_user(user_id: uuid.UUID, updated_user: UserUpdate, db: Session = Depe
     return db_user
 
 @router.delete("/users/{user_id}")
-def delete_user(user_id: uuid.UUID, db: Session = Depends(get_db)):
+def delete_user(user_id: uuid.UUID, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     db_user = db.query(database_models.User).filter(database_models.User.id == user_id).first()
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
@@ -79,8 +95,18 @@ def register_user(user_in: UserReg, session: Session = Depends(get_db)):
             detail="Пользователь с такой почтой или именем уже существует",
         )
     user = create_user(db=session, user=user_in)
-    return {"message": "User registered successfully"}  # Remove role from response
+
+    email_data = {
+        "subject": "Подтвердите свою почту",
+        "body": f"Перейдите по ссылке, чтобы подтвердить: {Settings().FRONTEND_HOST}/email-confirmation/{user.id}",
+        "to": user.email,
+        #"to": "tihegr@rambler.ru"
+    }
+    print(send_email(email_data))
+
+    return {"message": "User registered successfully"}
 
 @router.get("/users_login/me", response_model=User)
 def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
+
