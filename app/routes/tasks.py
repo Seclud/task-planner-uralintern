@@ -8,7 +8,7 @@ from app import database_models
 router = APIRouter()
 
 @router.post("/tasks/", response_model=Task)
-def create_task(task: TaskCreate, db: Session = Depends(get_db)):
+def create_task(task: TaskCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     db_task = database_models.Task(
         project_id=task.project_id,
         title=task.title,
@@ -40,7 +40,7 @@ def read_tasks(project_id: uuid.UUID, current_user: User = Depends(get_current_u
     return db_tasks
 
 @router.put("/tasks/{task_id}")
-def update_task(task_id: uuid.UUID, updated_task: TaskUpdate, db: Session = Depends(get_db)):
+def update_task(task_id: uuid.UUID, updated_task: TaskUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     db_task = db.query(database_models.Task).filter(database_models.Task.id == task_id).first()
     if db_task is None:
         raise HTTPException(status_code=404, detail="Task not found")
@@ -57,7 +57,7 @@ def update_task(task_id: uuid.UUID, updated_task: TaskUpdate, db: Session = Depe
     return db_task
 
 @router.delete("/tasks/{task_id}")
-def delete_task(task_id: uuid.UUID, db: Session = Depends(get_db)):
+def delete_task(task_id: uuid.UUID, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     db_task = db.query(database_models.Task).filter(database_models.Task.id == task_id).first()
     if db_task is None:
         raise HTTPException(status_code=404, detail="Task not found")

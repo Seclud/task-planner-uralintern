@@ -8,7 +8,7 @@ from app import database_models
 router = APIRouter()
 
 @router.post("/projects/", response_model=Project)
-def create_project(project: ProjectCreate, db: Session = Depends(get_db)):
+def create_project(project: ProjectCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     db_project = database_models.Project(
         name=project.name,
         description=project.description,
@@ -40,7 +40,7 @@ def create_project(project: ProjectCreate, db: Session = Depends(get_db)):
     return db_project
 
 @router.get("/projects/all", response_model=list[Project])
-def read_all_projects(db: Session = Depends(get_db)):
+def read_all_projects(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     projects = db.query(database_models.Project).all()
     return projects
 
@@ -54,7 +54,7 @@ def read_project(project_id: uuid.UUID, current_user: User = Depends(get_current
     return db_project
 
 @router.put("/projects/{project_id}", response_model=Project)
-def update_project(project_id: uuid.UUID, updated_project: ProjectUpdate, db: Session = Depends(get_db)):
+def update_project(project_id: uuid.UUID, updated_project: ProjectUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     db_project = db.query(database_models.Project).filter(database_models.Project.id == project_id).first()
     if db_project is None:
         raise HTTPException(status_code=404, detail="Project not found")
@@ -78,7 +78,7 @@ def update_project(project_id: uuid.UUID, updated_project: ProjectUpdate, db: Se
     return db_project
 
 @router.delete("/projects/{project_id}")
-def delete_project(project_id: uuid.UUID, db: Session = Depends(get_db)):
+def delete_project(project_id: uuid.UUID, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     db_project = db.query(database_models.Project).filter(database_models.Project.id == project_id).first()
     if db_project is None:
         raise HTTPException(status_code=404, detail="Project not found")
@@ -99,7 +99,7 @@ def read_projects(current_user: User = Depends(get_current_user), db: Session = 
     return projects
 
 @router.get("/projects/{project_id}/participants", response_model=list[User])
-def get_project_participants(project_id: uuid.UUID, db: Session = Depends(get_db)):
+def get_project_participants(project_id: uuid.UUID, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     db_project = db.query(database_models.Project).filter(database_models.Project.id == project_id).first()
     if db_project is None:
         raise HTTPException(status_code=404, detail="Project not found")
