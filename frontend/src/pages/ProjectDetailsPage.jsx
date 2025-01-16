@@ -21,7 +21,7 @@ function TaskList({ title, tasks, onTaskDragStart, onTaskDragOver, onTaskDrop, r
             onDrop={isDraggable ? (e) => onTaskDrop(e, title) : null}
             style={{ minWidth: 300, flexGrow: 1 }}
         >
-            <Text size="xl" fw={700} color = "#353535">{title}</Text>
+            <Text size="xl" fw={700} color="#353535">{title}</Text>
             {title === completedStatus && !showOldTasks && (
                 <Text size="sm" color="dimmed">Скрыто задач: {hiddenOldTasksCount}</Text>
             )}
@@ -72,9 +72,9 @@ function AdminProjectDetailsPage(props) {
         <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
             <Group position="apart" justify="space-between">
                 <div>
-                    <Text size="xl" fw={500} color = "#353535">{props.project.name}</Text>
+                    <Text size="xl" fw={500} color="#353535">{props.project.name}</Text>
                     <Space h="9px" />
-                    <Text  color = "#353535" >{props.project.description}</Text>
+                    <Text color="#353535" >{props.project.description}</Text>
                     <Group position="apart" style={{ marginTop: 15 }}>
                         <div style={{ border: '1px solid black', padding: '5px', borderRadius: '5px' }}>
                             <Text color="black">Дата начала: {formatDate(props.project.start_date)}</Text>
@@ -83,7 +83,7 @@ function AdminProjectDetailsPage(props) {
                             <Text color="black">Дата конца: {formatDate(props.project.end_date)}</Text>
                         </div>
                     </Group>
-                    <Text  color = "#353535">Участники: {props.participants.map(p => p.username).join(', ')}</Text>
+                    <Text color="#353535">Участники: {props.participants.map(p => p.username).join(', ')}</Text>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                     <Group spacing="xs">
@@ -158,6 +158,7 @@ function AdminProjectDetailsPage(props) {
                 startDate={props.project.start_date}
                 endDate={props.project.end_date}
                 participants={props.participants}
+                statuses={props.statuses}
             />
             <AddColumnModal
                 isOpen={props.isAddColumnModalOpen}
@@ -181,9 +182,9 @@ function UserProjectDetailsPage(props) {
         <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
             <Group position="apart" justify="space-between">
                 <div>
-                    <Text size="xl" fw={500} color = "#353535">{props.project.name}</Text>
+                    <Text size="xl" fw={500} color="#353535">{props.project.name}</Text>
                     <Space h="9px" />
-                    <Text color = "#353535" >{props.project.description}</Text>
+                    <Text color="#353535" >{props.project.description}</Text>
                     <Group position="apart" style={{ marginTop: 15 }}>
                         <div style={{ border: '1px solid black', padding: '5px', borderRadius: '5px' }}>
                             <Text color="black">Дата начала: {formatDate(props.project.start_date)}</Text>
@@ -192,7 +193,7 @@ function UserProjectDetailsPage(props) {
                             <Text color="black">Дата конца: {formatDate(props.project.end_date)}</Text>
                         </div>
                     </Group>
-                    <Text color = "#353535">Участники: {props.participants.map(p => p.username).join(', ')}</Text>
+                    <Text color="#353535">Участники: {props.participants.map(p => p.username).join(', ')}</Text>
                 </div>
                 <Button color="blue" onClick={props.sendJoinRequest}>Отправить заявку на участие</Button>
             </Group>
@@ -236,9 +237,9 @@ function AssignedUserProjectDetailsPage(props) {
         <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
             <Group position="apart" justify="space-between">
                 <div>
-                    <Text size="xl" fw={500} color = "#353535">{props.project.name}</Text>
+                    <Text size="xl" fw={500} color="#353535">{props.project.name}</Text>
                     <Space h="9px" />
-                    <Text color = "#353535" >{props.project.description}</Text>
+                    <Text color="#353535" >{props.project.description}</Text>
                     <Group position="apart" style={{ marginTop: 15 }}>
                         <div style={{ border: '1px solid black', padding: '5px', borderRadius: '5px' }}>
                             <Text color="black">Дата начала: {formatDate(props.project.start_date)}</Text>
@@ -247,7 +248,7 @@ function AssignedUserProjectDetailsPage(props) {
                             <Text color="black">Дата конца: {formatDate(props.project.end_date)}</Text>
                         </div>
                     </Group>
-                    <Text color = "#353535">Участники: {props.participants.map(p => p.username).join(', ')}</Text>
+                    <Text color="#353535">Участники: {props.participants.map(p => p.username).join(', ')}</Text>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                     <Group spacing="xs">
@@ -457,6 +458,7 @@ function ProjectDetailsPage() {
                 participants: participants.map(p => p.id)
             }),
         });
+        refreshProjectDetails();
     };
 
     const removeColumn = async (statusKey) => {

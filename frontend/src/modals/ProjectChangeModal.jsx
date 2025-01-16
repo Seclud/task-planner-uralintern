@@ -2,7 +2,7 @@ import { Button, Space, Text, TextInput, Title, Modal, Stack, MultiSelect } from
 import { DatePickerInput } from "@mantine/dates";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import {BACKEND_URL} from "../main.jsx";
+import { BACKEND_URL } from "../main.jsx";
 
 export default function ProjectChangeModal(props) {
     const navigate = useNavigate();
@@ -41,7 +41,8 @@ export default function ProjectChangeModal(props) {
             description,
             start_date: startDate ? startDate.toISOString().split('T')[0] : null,
             end_date: endDate ? endDate.toISOString().split('T')[0] : null,
-            participants
+            participants,
+            statuses: props.statuses
         };
 
         try {
@@ -60,6 +61,7 @@ export default function ProjectChangeModal(props) {
 
             navigate(`/projects/${props.projectId}`);
             props.setIsOpen(false);
+            props.refreshProjectDetails()
         } catch (error) {
             console.error('Failed to change project:', error);
             setErrorMessage(error.message);
