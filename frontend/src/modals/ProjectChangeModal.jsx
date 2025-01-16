@@ -61,7 +61,6 @@ export default function ProjectChangeModal(props) {
 
             navigate(`/projects/${props.projectId}`);
             props.setIsOpen(false);
-            props.refreshProjectDetails()
         } catch (error) {
             console.error('Failed to change project:', error);
             setErrorMessage(error.message);
